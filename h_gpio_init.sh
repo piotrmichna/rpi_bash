@@ -25,6 +25,9 @@ function gpio_init(){
     GP_ID=( $( for i in $tmp ;do echo $i ;done ) )   
     GP_NUM=${#GP_ID[@]}
     
+    tmp=$(echo "SELECT typid FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
+    GP_TYPID=( $( for i in $tmp ;do echo $i ;done ) )
+  
     tmp=$(echo "SELECT gpio FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_GPIO=( $( for i in $tmp ;do echo $i ;done ) )
   

@@ -70,4 +70,10 @@ function gpio_init(){
   done
   #stop_test
 }
+
+function gpio_list(){
+  for (( i=0 ; i<GP_NUM ; i++ )) ; do
+    echo "id=${GP_ID[$i]} nazwa=${GP_NAZ[$i]} typid=${GP_TYPID[$i]} gpio=${GP_GPIO[$i]} dir=${GP_DIR[$i]} stan=${GP_STAN[$i]} act(${GP_STAN_ACT[$i]}"
+  done
+}
 #gpio_init

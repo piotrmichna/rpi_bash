@@ -14,12 +14,11 @@ source h_gpio_init.sh #funkcje zwiazane z obsługą gpio
 #gpio_set "ID wyjscia z tabeli item" "stan 1 lub 0"
 source h_prog.sh
 
-
 function init(){
     gpio_init
     log_sys "inicjalizacja gpio"
-    
 }
+
 function main(){
     log_sys "START SYSTEMU"
     init
@@ -37,8 +36,6 @@ function main(){
                 ddd=$(is_time_now $PR_NEXT_START_TIM )
                 aaa=$(sec_to_str $ddd)
                 echo "i nastapi za: $ddd -> $aaa"
-                
-                
             fi
         fi
         n=$(( n+1 ))        

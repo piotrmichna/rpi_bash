@@ -23,17 +23,24 @@ function main(){
     log_sys "START SYSTEMU"
     init
     gpio_list
-    
+    n=0
     while [ 1 ] ; do
         local SEC=$(date '+%-S')
         echo $SEC
-        gpio_get 12 # sprawdzenie stanu pinu sensora opisanym tablei item pod id=13
-        
-        if [ $? -lt 2 ] ; then
-            echo "stan -> $?"
+        gpio_gt 13  # sprawdzenie stanu pinu sensora opisanym tablei item pod id=13
+        #wyk=$?
+        if [ $wyk -lt 2 ] ; then
+            echo "stan -> $wyk"
         else
             echo "gpio nie jest sensorem"
         fi
+        
+        if [ $(( n%20 )) -eq 0 ] ; then
+            gpio_set 3 0
+        else
+            gpio_set 3 1
+        fi        
+        n=$(( n+1 ))
         sleep 1
     done
 }

@@ -82,14 +82,13 @@ function gpio_list(){
   done
 }
 
-function gpio_get(){
+function gpio_gt(){
     local ret=255
     for (( i=0 ; i<GP_NUM ; i++ )) ; do 
         if [ ${GP_ID[$i]} -eq $1 ] ; then
         #echo "sens ${GP_NAZ[$i]}"
             if [ ${GP_DIR[$i]} -eq 0 ] ; then
-                gpio read ${GP_GPIO[$i]}
-                 ret=$?
+               ret=$( gpio read ${GP_GPIO[$i]} )
                 if [ $ret -ne ${GP_STAN[$i]} ] ; then
                    GP_STAN[$i]=$ret
                    mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$ret WHERE id=${GP_ID[$i]};"

@@ -26,8 +26,17 @@ function sec_to_str(){
     echo "$tim_str"
 }
 
+function is_time_now(){
+    local TIM=`date --date="$1" +%s`
+    local TN=$(date +"%T")
+    local TNOW=`date --date="$TN" +%s`
+    local TE=$(( TIM-TNOW ))
+    
+    return $TE   
+}
+
 function get_next_start(){
-    TNOW=$(date +"%T")
+    local TNOW=$(date +"%T")
     local tmp=$(echo "SELECT COUNT(1) FROM start_time WHERE tim>'$TNOW' ORDER BY tim" | mysql -D$DB -u $USER -p$PASS -N)
     PR_START_NUM=${tmp[0]}   
     tmp=$(echo "SELECT tim FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)

@@ -45,6 +45,13 @@ function gpio_init(){
         tmp=$(echo "SELECT nazwa FROM item WHERE id=${GP_ID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
         GP_NAZ[$i]=${tmp[0]}
     done
+    
+    #------pobieranie nazw typow--------
+    for (( i=0 ; i<GP_NUM ; i++ )) ; do
+        tmp=$(echo "SELECT nazwa FROM item_typ WHERE id=${GP_TYPID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
+        GP_TYPNAZ[$i]=${tmp[0]}
+    done
+    
 
     #stop_test
     #echo "gpio_init"

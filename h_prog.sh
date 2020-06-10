@@ -34,10 +34,10 @@ function get_next_start(){
     PR_NEXT_START_TIM=${tmp[0]}   
      tmp=$(echo "SELECT id FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)
     PR_NEXT_PROG_ID=${tmp[0]}   
-    tsn=`date --date="$TNOW" +%s`
-    tss=`date --date="$PR_NEXT_START_TIM" +%s`
-    tse=$(( tss-tsn ))
+    #tsn=`date --date="$TNOW" +%s`
+    #tss=`date --date="$PR_NEXT_START_TIM" +%s`
+    #tse=$(( tss-tsn ))
     
-    xt=$( sec_to_str $tse )
-    echo "pozostały czas do startu to: $xt"
+    #xt=$( sec_to_str $tse )
+    #echo "pozostały czas do startu to: $xt"
 }

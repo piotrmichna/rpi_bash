@@ -9,6 +9,9 @@ source _test.sh #funkcje testujace czas wykonywania skryptu
 # stop_test
 source h_gpio_init.sh #funkcje zwiazane z obsługą gpio
 #gpio_init
+#gpio_list
+#gpio_get "ID sensroa z tabeli item"
+#gpio_set "ID wyjscia z tabeli item" "stan 1 lub 0"
 
 
 function init(){

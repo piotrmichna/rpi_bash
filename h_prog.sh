@@ -27,12 +27,11 @@ function sec_to_str(){
 }
 
 function is_time_now(){
-    local TIM=`date --date="$1" +%s`
+    local TIX=`date --date="$1" +%s`
     local TN=$(date +"%T")
-    local TNOW=`date --date="$TN" +%s`
-    local TE=$(( TIM-TNOW ))
-    
-    return $TE   
+    local TNW=`date --date="$TN" +%s`
+    local TE=$(( TIX-TNW ))    
+    echo "$TE"   
 }
 
 function get_next_start(){

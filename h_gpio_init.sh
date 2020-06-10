@@ -10,6 +10,9 @@ source _test.sh #funkcje testujace czas wykonywania skryptu
 
 GP_NUM=0
 GP_ID[0]=0
+GP_NAZ[0]=""
+GP_TYPID[0]=0
+GP_TYPNAZ[0]=""
 GP_GPIO[0]=0
 GP_DIR[0]=0
 GP_STAN[0]=0
@@ -55,4 +58,4 @@ function gpio_init(){
   done
   #stop_test
 }
-gpio_init
+#gpio_init

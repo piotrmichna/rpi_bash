@@ -13,6 +13,34 @@ PR_START_NUM=0
 PR_NEXT_START_TIM=""
 PR_NEXT_PROG_ID=0
 
+function sec_to_str(){
+    local T=$1
+    local H=$(( T/3600 ))
+    local X=$(( H*3600 ))
+    T=$(( T-X ))
+    local M=$(( T/60 ))
+    X=$(( M*60 ))
+    T=$(( T-X )) 
+    local S=$(( T%60 ))
+    local tim_str=""
+    if [ $H -lt 10 ] ; then
+        tim_str=$(echo "0$H:")
+    else
+        tim_str=$(echo "$H:")
+    fi
+    if [ $M -lt 10 ] ; then
+        tim_str=$(echo "${tim_str}0$M:")
+    else
+        tim_str=$(echo "${tim_str}$M:")
+    fi
+    if [ $S -lt 10 ] ; then
+        tim_str=$(echo "${tim_str}0$S")
+    else
+        tim_str=$(echo "${tim_str}$S")
+    fi
+    echo "$tim_str"
+}
+
 function get_next_start(){
     TNOW=$(date +"%T")
     local tmp=$(echo "SELECT COUNT(1) FROM start_time WHERE tim>'$TNOW' ORDER BY tim" | mysql -D$DB -u $USER -p$PASS -N)

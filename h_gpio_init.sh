@@ -39,6 +39,15 @@ function gpio_init(){
   
     tmp=$(echo "SELECT stan_act FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_STAN_ACT=( $( for i in $tmp ;do echo $i ;done ) )
+    
+    #----pobieranie nazw portow----------
+    local id=0
+    for (( i=0 ; i<GP_NUM ; i++ )) ; do
+        id=${GP_ID[$i]}
+        tmp=$(echo "SELECT nazwa FROM item WHERE id=$id" | mysql -D$DB -u $USER -p$PASS -N)
+        GP_NAZ[$i]=${tmp[0]}
+    done
+
     #stop_test
     #echo "gpio_init"
     #start_test

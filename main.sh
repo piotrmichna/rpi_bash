@@ -31,7 +31,14 @@ function main(){
         if [ $(( n%10 )) -eq 0 ] ; then
             get_next_start
             if [ $PR_START_NUM -gt 0 ] ; then
+                local TNOW=$(date +"%T")
+                echo "jest : $TNOW"
                 echo "nastepny z[$PR_START_NUM] startow jest o: $PR_NEXT_START_TIM"
+                ddd=$(is_time_now $PR_NEXT_START_TIM )
+                aaa=$(sec_to_str $ddd)
+                echo "i nastapi za: $ddd -> $aaa"
+                
+                
             fi
         fi
         n=$(( n+1 ))        

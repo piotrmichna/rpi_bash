@@ -24,7 +24,13 @@ function main(){
     while [ 1 ] ; do
         local SEC=$(date '+%-S')
         echo $SEC
+        gpio_get 12 # sprawdzenie stanu pinu sensora opisanym tablei item pod id=13
         
+        if [ $? -lt 2 ] ; then
+            echo "stan -> $?"
+        else
+            echo "gpio nie jest sensorem"
+        fi
         sleep 1
     done
 }

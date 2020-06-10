@@ -81,4 +81,24 @@ function gpio_list(){
     echo "id=${GP_ID[$i]} nazwa=${GP_NAZ[$i]} typid=${GP_TYPID[$i]} gpio=${GP_GPIO[$i]} dir=${GP_DIR[$i]} stan=${GP_STAN[$i]} act(${GP_STAN_ACT[$i]}"
   done
 }
+
+function gpio_get(){
+    local ret=255
+    for (( i=0 ; i<GP_NUM ; i++ )) ; do 
+        if [ ${GP_ID[$i]} -eq $1 ] ; then
+            if [ ${GP_DIR[$i]} -eq 0 ] ; then
+                local idx=${GP_ID[$i]}
+                local gp=${GP_GPIO[$i]}
+                ret=$( gpio read $gp )
+                if [ $ret -ne ${GP_STAN[$i]} ] ; then
+                   GP_STAN[$i]=$ret
+                   mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$ret WHERE id=$idx;"
+                fi
+            fi
+            break
+        fi
+    done
+    
+    return $ret
+}
 #gpio_init

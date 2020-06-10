@@ -20,7 +20,7 @@ GP_STAN_ACT[0]=0
 
 function gpio_init(){
     #echo "gpio_mysql_data"
-    #start_test
+    start_test
     local tmp=$(echo "SELECT id FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_ID=( $( for i in $tmp ;do echo $i ;done ) )   
     GP_NUM=${#GP_ID[@]}
@@ -73,7 +73,7 @@ function gpio_init(){
       gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
     fi
   done
-  #stop_test
+  stop_test
 }
 
 function gpio_list(){

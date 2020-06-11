@@ -90,3 +90,39 @@ function get_next_start(){
     #xt=$( sec_to_str $tse )
     #echo "pozostały czas do startu to: $xt"
 }
+
+function prog_event(){
+    if [ $PR_START_NUM -gt 0 ] ; then # są planowane starty
+        if [ $PR_ID -gt 0 ] ; then # program aktywny
+            echo "program run"
+        else # oczekiwanie na program
+            echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT"
+            if [ $PR_NEXT_TIM_SEC -gt 10 ] ; then # ilosc sekund do startu >10 
+                if [ $PR_NEXT_TIM_CNT -eq 0 ] ; then # akutalizacja ilosci sekund do startu
+                    PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
+                    PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_SEC/2 ))
+                else # odliczanie
+                    PR_NEXT_TIM_SEC=$(( PR_NEXT_TIM_SEC-1 ))
+                    PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_CNT-1 ))
+                fi                    
+            else # ilosc sekund do startu <10
+                PR_NEXT_TIM_SEC$( is_time_now "$PR_NEXT_TIM" )
+                if [ $PR_NEXT_TIM_SEC -lt 1 ] ; then
+                    PR_ID=$PR_NEXT_PROG_ID
+                    echo "start programu o id=$PR_ID"
+                    #praca programu
+                    PR_ID=-1
+                    get_next_start
+                fi
+            fi
+        fi
+    else
+        if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
+            echo "nowy dzien"
+            get_next_start
+            
+            NEW_DAY=$(date +"%-j")
+            
+        fi # ilosc startow    
+    fi # planowane starty
+}

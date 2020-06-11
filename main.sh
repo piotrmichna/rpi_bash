@@ -42,4 +42,5 @@ function main(){
         sleep 1
     done
 }
-main
+#main
+log_gp 3 1 "ok"

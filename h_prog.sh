@@ -9,11 +9,37 @@ source _test.sh #funkcje testujace czas wykonywania skryptu
 # stop_test
 
 TNOW=$(date +"%T") #zminna zawierający aktualny czas
-PR_START_NUM=0
+PR_START_NUM=-1
 PR_NEXT_TIM=""
 PR_NEXT_TIM_SEC=0
-PR_NEXT_TIM_ELSP="00:00:00"
-PR_NEXT_PROG_ID=0
+PR_NEXT_TIM_ELSP=""
+PR_NEXT_PROG_ID=-1
+PR_ID=-1
+PR_ITEM_NUM=0
+PR_LP=-1
+PR_NAZ=""
+
+function get_next_prog(){
+    if [ $PR_ID -gt 0 ] ; then
+        local tmp=$(echo "SELECT COUNT(1) FROM prog_item WHERE progid=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
+        PR_ITEM_NUM=${tmp[0]}
+        if [ $PR_ITEM_NUM -gt 0 ] ; then
+        
+        tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
+        PR_NAZ=${tmp[0]}
+        else
+            echo "wywolanie pustego programu"
+        fi
+        
+    else
+        PR_NEXT_TIM=""
+        PR_NEXT_TIM_SEC=-1
+        PR_NEXT_TIM_ELSP=""
+        PR_NEXT_PROG_ID=-1
+        PR_ID=-1
+        PR_LP=-1
+    fi
+}
 
 function sec_to_str(){
     local T=$1

@@ -63,18 +63,26 @@ function is_time_now(){
     local TNW=`date --date="$TN" +%s`
     local TE=$(( TIX-TNW ))    
     PR_NEXT_TIM_SEC=$TE
-    PR_NEXT_TIM_ELSP=$(sec_to_str $TE)
+    PR_NEXT_TIM_ELSP=$( sec_to_str $TE )
     echo "$TE"   
 }
 
 function get_next_start(){
     local TNOW=$(date +"%T")
     local tmp=$(echo "SELECT COUNT(1) FROM start_time WHERE tim>'$TNOW' ORDER BY tim" | mysql -D$DB -u $USER -p$PASS -N)
-    PR_START_NUM=${tmp[0]}   
-    tmp=$(echo "SELECT tim FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)
-    PR_NEXT_TIM=${tmp[0]}   
-     tmp=$(echo "SELECT id FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)
-    PR_NEXT_PROG_ID=${tmp[0]}   
+    PR_START_NUM=${tmp[0]}
+    echo "ilosc startow $PR_START_NUM"
+    if [ $PR_START_NUM -gt 0 ] ; then
+        tmp=$(echo "SELECT tim FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)
+        PR_NEXT_TIM=${tmp[0]}   
+        tmp=$(echo "SELECT progid FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)
+        PR_NEXT_PROG_ID=${tmp[0]}
+        PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
+        PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_SEC/2 ))
+    else
+        PR_NEXT_TIM=""
+        R_NEXT_PROG_ID=-1    
+    fi
     #tsn=`date --date="$TNOW" +%s`
     #tss=`date --date="$PR_NEXT_START_TIM" +%s`
     #tse=$(( tss-tsn ))

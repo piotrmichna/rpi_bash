@@ -45,4 +45,7 @@ function main(){
     done
 }
 #main
-log_gp 3 1 "ok"
+while [ 1 ] ; do
+    prog_event
+    sleep 1
+done

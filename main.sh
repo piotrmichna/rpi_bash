@@ -2,8 +2,10 @@
 #___main.sh___
 
 source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
-# log_sys "tresc informacji"
-# log_gp gpio stan "informacja"
+# log_sys "er" "blędna informacja" 
+# log_sys "poprawna informacja"
+# log_gp "er" GPIO STAN "blędna informacja" 
+# log_gp GPIO STAN "poprawna informacja" 
 source _test.sh #funkcje testujace czas wykonywania skryptu
 # start_test
 # stop_test

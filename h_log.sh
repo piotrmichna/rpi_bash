@@ -26,7 +26,20 @@ CUR_TIM=$(date +"%T")
 }
 
 function log_gp(){
+# log_gp "er" GPIO STAN "blędna informacja" 
+# log_gp GPIO STAN "poprawna informacja" 
+    if [ $1 = "er" ] ; then
+        local ER=1
+        local GPIO=$2
+        local STAN=$3
+        local OPI="$4"
+    else
+        local ER=0
+        local GPIO=$1
+        local STAN=$2
+        local OPI="$3"
+    fi
   CUR_DAT=$(date +"%F")
   CUR_TIM=$(date +"%T")
-  mysql -u $USER -p$PASS -D$DBH -e"INSERT INTO gpio (id, dat, tim, gpio, stan, opis) VALUES (NULL, '${CUR_DAT}', '${CUR_TIM}', ${1}, ${2}, '${3}');"
+  mysql -u $USER -p$PASS -D$DBH -e"INSERT INTO gpio (id, dat, tim, gpio, stan, opis, er) VALUES (NULL, '${CUR_DAT}', '${CUR_TIM}', $GPIO, $STAN, '$OPI', $ER);"
 }

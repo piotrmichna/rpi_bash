@@ -27,12 +27,11 @@ function get_next_prog(){
     if [ $PR_ID -gt 0 ] ; then
         local tmp=$(echo "SELECT COUNT(1) FROM prog_item WHERE progid=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
         PR_ITEM_NUM=${tmp[0]}
-        if [ $PR_ITEM_NUM -gt 0 ] ; then
-        
-        tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
-        PR_NAZ=${tmp[0]}
+        if [ $PR_ITEM_NUM -gt 0 ] ; then        
+            tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
+            PR_NAZ=${tmp[0]}
         else
-            echo "wywolanie pustego programu"
+            log_sys "er"  "wywolanie pustego programu"
         fi
         
     else

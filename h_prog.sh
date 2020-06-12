@@ -19,9 +19,25 @@ PR_NEXT_TIM_CNT=-1
 PR_NEXT_TIM_ELSP=""
 PR_NEXT_PROG_ID=-1
 PR_ID=-1
-PR_ITEM_NUM=0
 PR_LP=-1
 PR_NAZ=""
+PR_ITEM_NUM=0
+
+function end_prog(){
+    log_sys "KONIEC programu [ $PR_NAZ ]"
+    PR_NEXT_TIM=""
+    PR_NEXT_TIM_SEC=-1
+    PR_NEXT_TIM_CNT=-1
+    PR_NEXT_TIM_ELSP=""
+    PR_NEXT_PROG_ID=-1
+    PR_ID=-1
+    PR_LP=-1
+    PR_NAZ=""
+    PR_ITEM_NUM=0
+    if [ $PR_START_NUM -gt 0 ] ; then # sprawdz czy jest kolejny start
+        get_next_start
+    fi
+}
 
 function get_next_prog(){
     if [ $PR_ID -gt 0 ] ; then

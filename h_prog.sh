@@ -62,6 +62,19 @@ function end_prog(){
     fi
 }
 
+function sensor(){
+    if [ -z ${1+x} ] ; then
+        log_sys "er" "sensor bez parametru"
+    else
+        if [ $PR_ITEM_CNT[$1] -eq 0 ] ; then
+            #sprawdzenie stanu senasora
+            PR_ITEM_CNT[$1]=${PR_ITEM_DELAY[$1]}
+        else
+            PR_ITEM_CNT[$1]=$(( PR_ITEM_CNT[$1]-1 ))
+        fi
+    fi
+}
+
 function run_prog() {
     # obsluga wejsc sensorow
     # obsluga wyjsc sterujacych

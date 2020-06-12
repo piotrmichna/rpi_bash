@@ -77,16 +77,21 @@ function sensor(){
 }
 
 function run_prog() {
-    # obsluga wejsc sensorow
-    # obsluga wyjsc sterujacych
+
     for (( n=0 ; n<PR_ITEM_NUM ; n++ )) ; do
-        if [ $PR_ITEM_LP -eq 1 ] ; then
+        if [ $PR_ITEM_LP -eq $n ] ; then
             if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
                 #instrukcje dla wyjscia
+                break
             else
                 #instrukcje dla wejsc
+                if [ $PR_SENS_OK -eq 0 ] ; then
+                    #przerwanie dzialania programu
+                    end_prog
+                    break
+                fi
+                PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
             fi
-            break
         else
             #czynnosci rownolegle z poprzednich krokow
             if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then

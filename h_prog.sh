@@ -134,3 +134,12 @@ function wait_for_prog_start(){
         fi # ilosc startow    
     fi # planowane starty
 }
+
+function prog_event(){
+    if [ $PR_ITEM_LP -eq -1 ] ; then # program nie aktywny
+        wait_for_prog_start
+    else # program aktywny
+        echo "praca programu"
+        end_prog
+    fi
+}

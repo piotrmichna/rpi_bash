@@ -10,12 +10,12 @@ DBH="homhist"
 CUR_DAT=$(date +"%F")
 CUR_TIM=$(date +"%T")
 
-function log_sys(){ 
-# log_sys "er" "blędna informacja" 
+function log_sys(){
+# log_sys "er" "blędna informacja"
 # log_sys "poprawna informacja"
 CUR_DAT=$(date +"%F")
 CUR_TIM=$(date +"%T")
-    if [ $1 = "er" ] ; then
+    if [ "$1" = "er" ] ; then
         local ER=1
         local OPI="$2"
     else
@@ -26,9 +26,9 @@ CUR_TIM=$(date +"%T")
 }
 
 function log_gp(){
-# log_gp "er" GPIO STAN "blędna informacja" 
-# log_gp GPIO STAN "poprawna informacja" 
-    if [ $1 = "er" ] ; then
+# log_gp "er" GPIO STAN "blędna informacja"
+# log_gp GPIO STAN "poprawna informacja"
+    if [ "$1" = "er" ] ; then
         local ER=1
         local GPIO=$2
         local STAN=$3

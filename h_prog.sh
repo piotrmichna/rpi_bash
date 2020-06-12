@@ -36,8 +36,14 @@ function end_prog(){
     PR_NEXT_PROG_ID=-1
     PR_ID=-1    
     PR_NAZ=""
+    # zmienne urzadzen
     PR_ITEM_LP=-1
     PR_ITEM_NUM=0
+    PR_ITEM_ID[0]=0
+    PR_ITEM_PAR[0]=0
+    PR_ITEM_DELAY[0]=0
+    PR_ITEM_CNT[0]=0
+    
     if [ $PR_START_NUM -gt 0 ] ; then # sprawdz czy jest kolejny start
         get_next_start
     fi

@@ -58,7 +58,12 @@ function get_prog_item(){
     
     tmp=$(echo "SELECT delay_s FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
     PR_ITEM_DELAY=( $( for i in $tmp ;do echo $i ;done ) )
-    
+    # pobieranie wlasnosci item
+    for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
+        echo "pobierz inf dla gpio o id=${PR_ITEM_ID[$i]}"
+    done
+    # zerowanie kolejnosci elementow programu
+    PR_ITEM_LP=0
 }
 
 function begin_prog(){

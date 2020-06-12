@@ -46,6 +46,9 @@ function end_prog(){
     PR_ITEM_LP=-1
     PR_ITEM_NUM=0
     for (( i=1 ; i<PR_ITEM_NUM ; i++ )) ; do
+        if [ ${PR_ITEM_PAR[$i]} -eq 1 ] && [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
+            #wylacz wyjscie
+        fi
         unset PR_ITEM_ID[$i]
         unset PR_ITEM_PAR[$i]
         unset PR_ITEM_DELAY[$i]

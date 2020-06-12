@@ -8,12 +8,12 @@ STOP_N=0
 function start_test(){
     echo "---->START_TEST"
     START_S=$(date +%s)
-    START_N=$(date +%N)    
+    START_N=$(date +%-N)
 }
 
 function stop_test(){
     STOP_S=$(date +%s)
-    STOP_N=$(date +%N)
+    STOP_N=$(date +%-N)
     SS=$(( START_S-1 ))
     START_S=$(( START_S-SS ))
     STOP_S=$(( STOP_S-SS ))

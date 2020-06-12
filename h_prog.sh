@@ -69,9 +69,21 @@ function sensor(){
     else
         if [ $PR_ITEM_CNT[$1] -eq 0 ] ; then
             #sprawdzenie stanu senasora
+            local ret=$( gpio read ${GP_GPIO[${PR_ITEM_GPID[$1]}]} )
+            if [ $ret -ne ${GP_STAN[${PR_ITEM_GPID[$1]}]} ] ; then # wykryto zmiane stanu sensora
+                GP_STAN[${PR_ITEM_GPID[$1]}]=$ret
+                if [ $ret -eq ${GP_STAN_ACT[${PR_ITEM_GPID[$1]}]} ] ; then
+                    PR_SENS_OK=1
+                    log_gp "${GP_GPIO[${PR_ITEM_GPID[$1]}]}" "$ret" "zmiana - stan poprawny"
+                else
+                    PR_SENS_OK=0
+                    log_gp "${GP_GPIO[${PR_ITEM_GPID[$1]}]}" "$ret" "zmiana - stan negatywny"
+                fi
+            fi
             PR_ITEM_CNT[$1]=${PR_ITEM_DELAY[$1]}
+            if
         else
-            PR_ITEM_CNT[$1]=$(( PR_ITEM_CNT[$1]-1 ))
+            PR_ITEM_CNT[$1]=$((PR_ITEM_CNT[$1]-1))
         fi
     fi
 }

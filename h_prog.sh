@@ -19,24 +19,51 @@ PR_NEXT_TIM_CNT=-1
 PR_NEXT_TIM_ELSP=""
 PR_NEXT_PROG_ID=-1
 PR_ID=-1
-PR_LP=-1
 PR_NAZ=""
+
 PR_ITEM_NUM=0
+PR_ITEM_LP=-1
+PR_ITEM_ID[0]=0
+PR_ITEM_PAR[0]=0
+PR_ITEM_DELAY[0]=0
+PR_ITEM_CNT[0]=0
 
 function end_prog(){
-    log_sys "KONIEC programu [ $PR_NAZ ]"
     PR_NEXT_TIM=""
     PR_NEXT_TIM_SEC=-1
     PR_NEXT_TIM_CNT=-1
     PR_NEXT_TIM_ELSP=""
     PR_NEXT_PROG_ID=-1
-    PR_ID=-1
-    PR_LP=-1
+    PR_ID=-1    
     PR_NAZ=""
+    # zmienne urzadzen
+    PR_ITEM_LP=-1
     PR_ITEM_NUM=0
+    PR_ITEM_ID[0]=0
+    PR_ITEM_PAR[0]=0
+    PR_ITEM_DELAY[0]=0
+    PR_ITEM_CNT[0]=0
+    
     if [ $PR_START_NUM -gt 0 ] ; then # sprawdz czy jest kolejny start
         get_next_start
     fi
+}
+
+function get_prog_item(){
+    local tmp=$(echo "SELECT itemid FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_ID=( $( for i in $tmp ;do echo $i ;done ) )
+    
+    tmp=$(echo "SELECT parale FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_PAR=( $( for i in $tmp ;do echo $i ;done ) )
+    
+    tmp=$(echo "SELECT delay_s FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_DELAY=( $( for i in $tmp ;do echo $i ;done ) )
+    # pobieranie wlasnosci item
+    for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
+        echo "pobierz inf dla gpio o id=${PR_ITEM_ID[$i]}"
+    done
+    # zerowanie kolejnosci elementow programu
+    PR_ITEM_LP=0
 }
 
 function begin_prog(){
@@ -46,17 +73,14 @@ function begin_prog(){
         if [ $PR_ITEM_NUM -gt 0 ] ; then        
             tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
             PR_NAZ=${tmp[0]}
+            get_prog_item
         else
             log_sys "er"  "wywolanie pustego programu"
-        fi
-        
+            end_prog
+        fi        
     else
-        PR_NEXT_TIM=""
-        PR_NEXT_TIM_SEC=-1
-        PR_NEXT_TIM_ELSP=""
-        PR_NEXT_PROG_ID=-1
-        PR_ID=-1
-        PR_LP=-1
+        log_sys "KONIEC programu [ $PR_NAZ ]"
+        end_prog
     fi
 }
 
@@ -107,7 +131,7 @@ function get_next_start(){
     #echo "pozostały czas do startu to: $xt"
 }
 
-function prog_event(){
+function wait_for_prog_start(){
     if [ $PR_START_NUM -gt 0 ] ; then # są planowane starty
         if [ $PR_ID -gt 0 ] ; then # program aktywny
             echo "program run"
@@ -134,10 +158,17 @@ function prog_event(){
     else # brak startow biezacego dnia
         if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
             echo "nowy dzien"
-            get_next_start
-            
-            NEW_DAY=$(date +"%-j")
-            
+            get_next_start            
+            NEW_DAY=$(date +"%-j")            
         fi # ilosc startow    
     fi # planowane starty
+}
+
+function prog_event(){
+    if [ $PR_ITEM_LP -eq -1 ] ; then # program nie aktywny
+        wait_for_prog_start
+    else # program aktywny
+        echo "praca programu"
+        end_prog
+    fi
 }

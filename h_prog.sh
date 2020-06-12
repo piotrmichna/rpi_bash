@@ -70,7 +70,12 @@ function get_prog_item(){
     PR_ITEM_DELAY=( $( for i in $tmp ;do echo $i ;done ) )
     # pobieranie wlasnosci item
     for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
-        echo "pobierz inf dla gpio o id=${PR_ITEM_ID[$i]}"
+        for (( j=0 ; j<GP_NUM ; j++ )) ; do
+            if [ $GP_ID[$j] -eq $PR_ITEM_ID[$i] ] ; then
+                PR_ITEM_GPID[$i]=$j
+                break
+            fi
+        done
     done
     # zerowanie kolejnosci elementow programu
     PR_ITEM_LP=0

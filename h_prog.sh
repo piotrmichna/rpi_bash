@@ -89,28 +89,34 @@ function sensor(){
 }
 
 function run_prog() {
-
     for (( n=0 ; n<PR_ITEM_NUM ; n++ )) ; do
-        if [ $PR_ITEM_LP -eq $n ] ; then
+        if [ $PR_ITEM_LP -eq $n ] ; then #wywolanie dla kolejnych etapow programu
             if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
                 #instrukcje dla wyjscia
                 break
             else
                 #instrukcje dla wejsc
+                sensor "$n"
                 if [ $PR_SENS_OK -eq 0 ] ; then
                     #przerwanie dzialania programu
+                    log_sys "er" "STOP z sensora ${GP_NAZ[${PR_ITEM_GPID[$n]}]} w lp=$PR_ITEM_LP"
                     end_prog
                     break
                 fi
                 PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
             fi
-        else
+        else # wywolanie dla etapow poprzednich i ciaglych
             #czynnosci rownolegle z poprzednich krokow
             if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then
                 if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
                     #instrukcje dla wyjscia
                 else
                     #instrukcje dla wejsc
+                    if [ $PR_SENS_OK -eq 0 ] ; then
+                        #przerwanie dzialania programu
+                        end_prog
+                        break
+                    fi
                 fi
             fi
         fi

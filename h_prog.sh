@@ -43,6 +43,12 @@ function end_prog(){
     # zmienne urzadzen
     PR_ITEM_LP=-1
     PR_ITEM_NUM=0
+    for (( i=1 ; i<PR_ITEM_NUM ; i++ )) ; do
+        unset PR_ITEM_ID[$i]
+        unset PR_ITEM_PAR[$i]
+        unset PR_ITEM_DELAY[$i]
+        unset PR_ITEM_CNT[$i]
+    done
     PR_ITEM_ID[0]=0
     PR_ITEM_PAR[0]=0
     PR_ITEM_DELAY[0]=0

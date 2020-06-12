@@ -82,6 +82,7 @@ function sensor(){
                     PR_SENS_OK=0
                     log_gp "${GP_GPIO[${PR_ITEM_GPID[$1]}]}" "$ret" "zmiana - stan negatywny"
                 fi
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$ret WHERE id=${GP_ID[${PR_ITEM_GPID[$1]}]};"
             fi
             PR_ITEM_CNT[$1]=${PR_ITEM_DELAY[$1]}
             if

@@ -22,36 +22,36 @@ function gpio_init(){
     #echo "gpio_mysql_data"
     start_test
     local tmp=$(echo "SELECT id FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
-    GP_ID=( $( for i in $tmp ;do echo $i ;done ) )   
+    GP_ID=( $( for i in $tmp ;do echo $i ;done ) )
     GP_NUM=${#GP_ID[@]}
-    
+
     tmp=$(echo "SELECT typid FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_TYPID=( $( for i in $tmp ;do echo $i ;done ) )
-  
+
     tmp=$(echo "SELECT gpio FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_GPIO=( $( for i in $tmp ;do echo $i ;done ) )
-  
+
     tmp=$(echo "SELECT dir FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_DIR=( $( for i in $tmp ;do echo $i ;done ) )
-  
+
     tmp=$(echo "SELECT stan FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_STAN=( $( for i in $tmp ;do echo $i ;done ) )
-  
+
     tmp=$(echo "SELECT stan_act FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_STAN_ACT=( $( for i in $tmp ;do echo $i ;done ) )
-    
+
     #----pobieranie nazw gpio----------
     for (( i=0 ; i<GP_NUM ; i++ )) ; do
         tmp=$(echo "SELECT nazwa FROM item WHERE id=${GP_ID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
         GP_NAZ[$i]=${tmp[0]}
     done
-    
+
     #------pobieranie nazw typow--------
     for (( i=0 ; i<GP_NUM ; i++ )) ; do
         tmp=$(echo "SELECT nazwa FROM item_typ WHERE id=${GP_TYPID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
         GP_TYPNAZ[$i]=${tmp[0]}
     done
-    
+
 
     #stop_test
     #echo "gpio_init"
@@ -84,7 +84,7 @@ function gpio_list(){
 
 function gpio_gt(){
     local ret=255
-    for (( i=0 ; i<GP_NUM ; i++ )) ; do 
+    for (( i=0 ; i<GP_NUM ; i++ )) ; do
         if [ ${GP_ID[$i]} -eq $1 ] ; then
         #echo "sens ${GP_NAZ[$i]}"
             if [ ${GP_DIR[$i]} -eq 0 ] ; then
@@ -99,7 +99,7 @@ function gpio_gt(){
             fi
             break
         fi
-    done    
+    done
     return $ret
 }
 

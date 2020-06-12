@@ -24,7 +24,6 @@ PR_NAZ=""
 PR_ITEM_NUM=0
 
 function end_prog(){
-    log_sys "KONIEC programu [ $PR_NAZ ]"
     PR_NEXT_TIM=""
     PR_NEXT_TIM_SEC=-1
     PR_NEXT_TIM_CNT=-1
@@ -48,15 +47,11 @@ function begin_prog(){
             PR_NAZ=${tmp[0]}
         else
             log_sys "er"  "wywolanie pustego programu"
-        fi
-        
+            end_prog
+        fi        
     else
-        PR_NEXT_TIM=""
-        PR_NEXT_TIM_SEC=-1
-        PR_NEXT_TIM_ELSP=""
-        PR_NEXT_PROG_ID=-1
-        PR_ID=-1
-        PR_LP=-1
+        log_sys "KONIEC programu [ $PR_NAZ ]"
+        end_prog
     fi
 }
 

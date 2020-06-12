@@ -7,7 +7,7 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_gp "er" GPIO STAN "blędna informacja"
 # log_gp GPIO STAN "poprawna informacja"
 
-GP_NUM=0
+GP_NUM=-1
 GP_ID[0]=0
 GP_NAZ[0]=""
 GP_TYPID[0]=0

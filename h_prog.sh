@@ -162,6 +162,9 @@ function wait_for_prog_start(){
     else # brak startow biezacego dnia
         if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
             echo "nowy dzien"
+            if [ $GP_NUM -eq -1 ] ; then
+                gpio_init
+            fi
             get_next_start
             NEW_DAY=$(date +"%-j")
         fi # ilosc startow

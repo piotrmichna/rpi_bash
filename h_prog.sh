@@ -49,6 +49,18 @@ function end_prog(){
     fi
 }
 
+function get_prog_item(){
+    local tmp=$(echo "SELECT itemid FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_ID=( $( for i in $tmp ;do echo $i ;done ) )
+    
+    tmp=$(echo "SELECT parale FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_PAR=( $( for i in $tmp ;do echo $i ;done ) )
+    
+    tmp=$(echo "SELECT delay_s FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
+    PR_ITEM_DELAY=( $( for i in $tmp ;do echo $i ;done ) )
+    
+}
+
 function begin_prog(){
     if [ $PR_ID -gt 0 ] ; then
         local tmp=$(echo "SELECT COUNT(1) FROM prog_item WHERE progid=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)

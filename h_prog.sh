@@ -97,7 +97,26 @@ function run_prog() {
         if [ $PR_ITEM_LP -eq $n ] ; then #wywolanie dla kolejnych etapow programu
             if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
                 #instrukcje dla wyjscia
-                break
+                if [ ${PR_ITEM_CNT[$n]} -lt ${PR_ITEM_DELAY[$n]} ] ; then
+                    # wysterowanie wyjscia gdy cnt=0
+                    if [ ${PR_ITEM_CNT[$n]} -eq 0 ] ; then
+                        echo "wlacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
+                        #skok do nastpnego kroku jesli wyscie jest rownolegle
+                        if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then
+                            PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
+                        else
+                            # odliczanie czasu delay cnt<delay
+                            break
+                        fi
+                    else
+                        # odliczanie czasu delay cnt<delay
+                        PR_ITEM_CNT[$n]=$(( PR_ITEM_CNT[$n]+1 ))
+                        break
+                    fi
+                else
+                    # wylaczenie wyjscia cnt=delay
+                    PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
+                fi
             else
                 #instrukcje dla wejsc
                 sensor "$n"

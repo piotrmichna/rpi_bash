@@ -119,6 +119,7 @@ function get_prog_item(){
         for (( j=0 ; j<GP_NUM ; j++ )) ; do
             if [ $GP_ID[$j] -eq $PR_ITEM_ID[$i] ] ; then
                 PR_ITEM_GPID[$i]=$j
+                PR_ITEM_CNT[i]=0
                 break
             fi
         done

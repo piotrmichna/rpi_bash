@@ -62,6 +62,30 @@ function end_prog(){
     fi
 }
 
+function run_prog() {
+    # obsluga wejsc sensorow
+    # obsluga wyjsc sterujacych
+    for (( n=0 ; n<PR_ITEM_NUM ; n++ )) ; do
+        if [ $PR_ITEM_LP -eq 1 ] ; then
+            if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
+                #instrukcje dla wyjscia
+            else
+                #instrukcje dla wejsc
+            fi
+            break
+        else
+            #czynnosci rownolegle z poprzednich krokow
+            if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then
+                if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
+                    #instrukcje dla wyjscia
+                else
+                    #instrukcje dla wejsc
+                fi
+            fi
+        fi
+    done
+}
+
 function get_prog_item(){
     local tmp=$(echo "SELECT itemid FROM prog_item WHERE progid=$PR_ID ORDER BY lp" | mysql -D$DB -u $USER -p$PASS -N)
     PR_ITEM_ID=( $( for i in $tmp ;do echo $i ;done ) )

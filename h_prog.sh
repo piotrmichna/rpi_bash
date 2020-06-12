@@ -102,7 +102,7 @@ function get_next_start(){
     #echo "pozostały czas do startu to: $xt"
 }
 
-function prog_event(){
+function wait_for_prog_start(){
     if [ $PR_START_NUM -gt 0 ] ; then # są planowane starty
         if [ $PR_ID -gt 0 ] ; then # program aktywny
             echo "program run"
@@ -129,10 +129,8 @@ function prog_event(){
     else # brak startow biezacego dnia
         if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
             echo "nowy dzien"
-            get_next_start
-            
-            NEW_DAY=$(date +"%-j")
-            
+            get_next_start            
+            NEW_DAY=$(date +"%-j")            
         fi # ilosc startow    
     fi # planowane starty
 }

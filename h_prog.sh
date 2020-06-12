@@ -31,6 +31,7 @@ PR_ITEM_ID[0]=0
 PR_ITEM_PAR[0]=0
 PR_ITEM_DELAY[0]=0
 PR_ITEM_CNT[0]=0
+PR_ITEM_GPID[0]=0
 
 function end_prog(){
     PR_NEXT_TIM=""
@@ -48,11 +49,13 @@ function end_prog(){
         unset PR_ITEM_PAR[$i]
         unset PR_ITEM_DELAY[$i]
         unset PR_ITEM_CNT[$i]
+        unset PR_ITEM_GPID[$i]
     done
     PR_ITEM_ID[0]=0
     PR_ITEM_PAR[0]=0
     PR_ITEM_DELAY[0]=0
     PR_ITEM_CNT[0]=0
+    PR_ITEM_GPID[0]=0
 
     if [ $PR_START_NUM -gt 0 ] ; then # sprawdz czy jest kolejny start
         get_next_start

@@ -24,7 +24,7 @@ PR_NEXT_TIM_ELSP=""
 PR_NEXT_PROG_ID=-1
 PR_ID=-1
 PR_NAZ=""
-
+PR_SENS_OK=1
 PR_ITEM_NUM=0
 PR_ITEM_LP=-1
 PR_ITEM_ID[0]=0
@@ -42,6 +42,7 @@ function end_prog(){
     PR_ID=-1
     PR_NAZ=""
     # zmienne urzadzen
+    PR_SENS_OK=1
     PR_ITEM_LP=-1
     PR_ITEM_NUM=0
     for (( i=1 ; i<PR_ITEM_NUM ; i++ )) ; do

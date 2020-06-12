@@ -73,6 +73,7 @@ function begin_prog(){
         if [ $PR_ITEM_NUM -gt 0 ] ; then        
             tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
             PR_NAZ=${tmp[0]}
+            get_prog_item
         else
             log_sys "er"  "wywolanie pustego programu"
             end_prog

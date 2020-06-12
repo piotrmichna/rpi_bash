@@ -34,6 +34,7 @@ PR_ITEM_CNT[0]=0
 PR_ITEM_GPID[0]=0
 
 function end_prog(){
+    echo "end_prog"
     PR_NEXT_TIM=""
     PR_NEXT_TIM_SEC=-1
     PR_NEXT_TIM_CNT=-1
@@ -48,6 +49,7 @@ function end_prog(){
     for (( i=1 ; i<PR_ITEM_NUM ; i++ )) ; do
         if [ ${PR_ITEM_PAR[$i]} -eq 1 ] && [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
             #wylacz wyjscie
+            log_gp "${GP_GPIO[${PR_ITEM_GPID[$i]}]}" "$ret" "zmiana - off"
         fi
         unset PR_ITEM_ID[$i]
         unset PR_ITEM_PAR[$i]
@@ -70,7 +72,7 @@ function sensor(){
     if [ -z ${1+x} ] ; then
         log_sys "er" "sensor bez parametru"
     else
-        if [ $PR_ITEM_CNT[$1] -eq 0 ] ; then
+        if [ ${PR_ITEM_CNT[$1]} -eq 0 ] ; then
             #sprawdzenie stanu senasora
             local ret=$( gpio read ${GP_GPIO[${PR_ITEM_GPID[$1]}]} )
             if [ $ret -ne ${GP_STAN[${PR_ITEM_GPID[$1]}]} ] ; then # wykryto zmiane stanu sensora
@@ -85,7 +87,6 @@ function sensor(){
                 mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$ret WHERE id=${GP_ID[${PR_ITEM_GPID[$1]}]};"
             fi
             PR_ITEM_CNT[$1]=${PR_ITEM_DELAY[$1]}
-            if
         else
             PR_ITEM_CNT[$1]=$((PR_ITEM_CNT[$1]-1))
         fi
@@ -93,6 +94,7 @@ function sensor(){
 }
 
 function run_prog() {
+    echo "run_program LP=$PR_ITEM_LP"
     for (( n=0 ; n<PR_ITEM_NUM ; n++ )) ; do
         if [ $PR_ITEM_LP -eq $n ] ; then #wywolanie dla kolejnych etapow programu
             if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
@@ -102,6 +104,7 @@ function run_prog() {
                     if [ ${PR_ITEM_CNT[$n]} -eq 0 ] ; then
                         echo "wlacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
                         #skok do nastpnego kroku jesli wyscie jest rownolegle
+                        PR_ITEM_CNT[$n]=$(( PR_ITEM_CNT[$n]+1 ))
                         if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then
                             PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
                         else
@@ -115,6 +118,7 @@ function run_prog() {
                     fi
                 else
                     # wylaczenie wyjscia cnt=delay
+                    echo "wylacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
                     PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
                 fi
             else
@@ -158,9 +162,9 @@ function get_prog_item(){
     # pobieranie wlasnosci item
     for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
         for (( j=0 ; j<GP_NUM ; j++ )) ; do
-            if [ $GP_ID[$j] -eq $PR_ITEM_ID[$i] ] ; then
+            if [ ${GP_ID[$j]} -eq ${PR_ITEM_ID[$i]} ] ; then
                 PR_ITEM_GPID[$i]=$j
-                PR_ITEM_CNT[i]=0
+                PR_ITEM_CNT[$i]=0
                 break
             fi
         done
@@ -249,7 +253,7 @@ function wait_for_prog_start(){
                     PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_CNT-1 ))
                 fi
             else # ilosc sekund do startu <10
-                PR_NEXT_TIM_SEC$( is_time_now "$PR_NEXT_TIM" )
+                PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
                 if [ $PR_NEXT_TIM_SEC -lt 1 ] ; then
                     PR_ID=$PR_NEXT_PROG_ID
                     echo "start programu o id=$PR_ID"
@@ -274,7 +278,9 @@ function prog_event(){
     if [ $PR_ITEM_LP -eq -1 ] ; then # program nie aktywny
         wait_for_prog_start
     else # program aktywny
-        echo "praca programu"
-        end_prog
+        run_prog
+        if [ $PR_ITEM_LP -eq $PR_ITEM_NUM ] ; then
+            end_prog
+        fi
     fi
 }

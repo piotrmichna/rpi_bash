@@ -39,7 +39,7 @@ function end_prog(){
     fi
 }
 
-function get_next_prog(){
+function begin_prog(){
     if [ $PR_ID -gt 0 ] ; then
         local tmp=$(echo "SELECT COUNT(1) FROM prog_item WHERE progid=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
         PR_ITEM_NUM=${tmp[0]}
@@ -126,13 +126,12 @@ function prog_event(){
                 if [ $PR_NEXT_TIM_SEC -lt 1 ] ; then
                     PR_ID=$PR_NEXT_PROG_ID
                     echo "start programu o id=$PR_ID"
-                    #praca programu
-                    PR_ID=-1
-                    get_next_start
+                    #wywolanie planowanego programu
+                    begin_prog
                 fi
             fi
-        fi
-    else
+        fi # oczekiwanie na program
+    else # brak startow biezacego dnia
         if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
             echo "nowy dzien"
             get_next_start

@@ -55,3 +55,27 @@ function gpio_get_data(){
     done
     #stop_test
 }
+
+function gpio_init(){
+    gpio_get_data #pobranie parametru gpio z bazy danych
+    #start_test
+    for (( i=0 ; i<GP_NUM ; i++ )) ; do
+    if [ ${GP_DIR[$i]} -eq 1 ] ; then # wyjści sterujące
+      if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
+        gpio write ${GP_GPIO[$i]} 0 #pulup GND
+      else
+        gpio write ${GP_GPIO[$i]} 1 #pulup Vcc
+      fi
+      gpio mode ${GP_GPIO[$i]} out #kierunek wyjściowy
+    else  # wejście pomiaru
+      if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
+        gpio mode ${GP_GPIO[$i]} down #pulup GND
+      else
+        gpio mode ${GP_GPIO[$i]} up #pulup Vcc
+      fi
+      gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
+    fi
+  done
+  #stop_test
+}
+

@@ -6,9 +6,6 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_sys "poprawna informacja"
 # log_gp "er" GPIO STAN "blędna informacja"
 # log_gp GPIO STAN "poprawna informacja"
-source _test.sh #funkcje testujace czas wykonywania skryptu
-# start_test
-# stop_test
 
 GP_NUM=0
 GP_ID[0]=0
@@ -21,8 +18,6 @@ GP_STAN[0]=0
 GP_STAN_ACT[0]=0
 
 function gpio_get_data(){
-    #echo "gpio_mysql_data"
-    #start_test
     local tmp=$(echo "SELECT id FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_ID=( $( for i in $tmp ;do echo $i ;done ) )
     GP_NUM=${#GP_ID[@]}
@@ -53,7 +48,6 @@ function gpio_get_data(){
         tmp=$(echo "SELECT nazwa FROM item_typ WHERE id=${GP_TYPID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
         GP_TYPNAZ[$i]=${tmp[0]}
     done
-    #stop_test
 }
 
 function gpio_list(){
@@ -63,8 +57,8 @@ function gpio_list(){
 }
 
 function gpio_init(){
+     log_sys "inicjacja gpio"
     gpio_get_data #pobranie parametru gpio z bazy danych
-    #start_test
     for (( i=0 ; i<GP_NUM ; i++ )) ; do
     if [ ${GP_DIR[$i]} -eq 1 ] ; then # wyjści sterujące
       if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
@@ -82,6 +76,5 @@ function gpio_init(){
       gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
     fi
   done
-  #stop_test
 }
 

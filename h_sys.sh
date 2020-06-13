@@ -36,3 +36,8 @@ function sys_restart(){
     log_sys "RESTART systemu"
     sudo reboot
 }
+
+function sys_power_off(){
+    log_sys "WYŁĄCZENIE systemu"
+    sudo shutdown now
+}

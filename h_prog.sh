@@ -140,6 +140,7 @@ function run_prog() {
                     # wysterowanie wyjscia gdy cnt=0
                     if [ ${PR_ITEM_CNT[$n]} -eq 0 ] ; then
                         echo "wlacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
+                        gpo_out "$n" "1"
                         #skok do nastpnego kroku jesli wyscie jest rownolegle
                         PR_ITEM_CNT[$n]=$(( PR_ITEM_CNT[$n]+1 ))
                         if [ ${PR_ITEM_PAR[$n]} -eq 1 ] ; then
@@ -156,6 +157,7 @@ function run_prog() {
                 else
                     # wylaczenie wyjscia cnt=delay
                     echo "wylacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
+                    gpo_out "$n" "0"
                     PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
                 fi
             else

@@ -73,6 +73,8 @@ function sys_reload(){
 }
 
 function sys_check(){
+    tmp=$(echo "SELECT valu FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
+    SYS_VAL=( $( for i in $tmp ;do echo $i ;done ) )
     for (( i=0 ; i<SYS_NUM ; i++ )) ; do
         if [ ${SYS_VAL[$i]} -eq 1 ] ; then # rejestr aktywny
             case "${SYS_COM[$i]}" in

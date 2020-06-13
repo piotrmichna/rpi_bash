@@ -10,11 +10,12 @@ source _test.sh #funkcje testujace czas wykonywania skryptu
 # start_test
 # stop_test
 source h_prog.sh
+source h_sys.sh
 
 
 function main(){
     log_sys "START SYSTEMU"
-
+    sys_init
     while [ 1 ] ; do
         #start_test
         prog_event

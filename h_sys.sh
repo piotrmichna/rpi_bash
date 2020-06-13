@@ -57,7 +57,7 @@ function sys_update(){
     #html
     log_sys "AKTUALIZACJA PANELU sterowania"
     cd /var/www/html/
-    git chckout master
+    git checkout master
     git pull bitb master
     sleep 10
     log_sys "RESTART systemu"

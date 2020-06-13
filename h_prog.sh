@@ -45,7 +45,6 @@ function end_prog(){
     # zmienne urzadzen
     PR_SENS_OK=1
     PR_ITEM_LP=-1
-    PR_ITEM_NUM=0
     for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
         if [ ${PR_ITEM_PAR[$i]} -eq 1 ] && [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
             #wylacz wyjscie
@@ -59,7 +58,7 @@ function end_prog(){
             unset PR_ITEM_GPID[$i]
         fi
     done
-
+    PR_ITEM_NUM=0
     PR_ITEM_ID[0]=0
     PR_ITEM_PAR[0]=0
     PR_ITEM_DELAY[0]=0

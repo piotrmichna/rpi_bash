@@ -11,6 +11,7 @@ SYS_NUM=0
 SYS_ID[0]=0
 SYS_COM[0]=""
 SYS_VAL[0]=0
+SYS_DELAY=10
 
 function sys_init(){
     if [ $SYS_NUM -gt 1 ] ; then
@@ -20,7 +21,9 @@ function sys_init(){
             unset SYS_VAL[$i]
         done
     fi
-    local tmp=$(echo "SELECT COUNT(1) FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
+     local tmp=$(echo "SELECT valu FROM cnf WHERE comm='check_delay'" | mysql -D$DB -u $USER -p$PASS -N)
+    SYS_DELAY=${tmp[0]}
+    tmp=$(echo "SELECT COUNT(1) FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     SYS_NUM=${tmp[0]}
     if [ $SYS_NUM -gt 0 ] ; then
         tmp=$(echo "SELECT id FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)

@@ -1,0 +1,16 @@
+
+[Unit]
+Description=Homster Service
+After=network-online.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/bin/bash /home/pi/homster_dev/h_main.sh
+WorkingDirectory=/home/pi/homster_dev/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

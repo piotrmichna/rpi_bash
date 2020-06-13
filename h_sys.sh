@@ -81,6 +81,7 @@ function sys_event(){
             sys_init
         fi
         # sprawdzenie funkcji systemowych
+        sys_check
         SYS_CNT=$SYS_DELAY
     else
         SYS_CNT=$(( SYS_CNT-1))

@@ -40,11 +40,13 @@ function sys_init(){
 
 function sys_restart(){
     log_sys "RESTART systemu"
+    mysql -D$DB -u $USER -p$PASS -N -e"UPDATE cnf SET valu=0 WHERE comm='restart';"
     sudo reboot
 }
 
 function sys_power_off(){
     log_sys "WYŁĄCZENIE systemu"
+    mysql -D$DB -u $USER -p$PASS -N -e"UPDATE cnf SET valu=0 WHERE comm='power_off';"
     sudo shutdown now
 }
 
@@ -61,6 +63,7 @@ function sys_update(){
     git pull bitb master
     sleep 10
     log_sys "RESTART systemu"
+    mysql -D$DB -u $USER -p$PASS -N -e"UPDATE cnf SET valu=0 WHERE comm='update';"
     sudo reboot
 }
 

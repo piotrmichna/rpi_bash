@@ -30,5 +30,4 @@ function main(){
         fi
     done
 }
-
 main

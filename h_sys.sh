@@ -41,3 +41,19 @@ function sys_power_off(){
     log_sys "WYŁĄCZENIE systemu"
     sudo shutdown now
 }
+
+function sys_update(){
+    #bash
+    log_sys "AKTUALIZACJA POWŁOKI systemu"
+    cd ~/homster4
+    git checkout master
+    git pull bitb master
+    #html
+    log_sys "AKTUALIZACJA PANELU sterowania"
+    cd /var/www/html/
+    git chckout master
+    git pull bitb master
+    sleep 10
+    log_sys "RESTART systemu"
+    sudo reboot
+}

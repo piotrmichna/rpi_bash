@@ -31,3 +31,8 @@ function sys_init(){
         SYS_VAL=( $( for i in $tmp ;do echo $i ;done ) )
     fi
 }
+
+function sys_restart(){
+    log_sys "RESTART systemu"
+    sudo reboot
+}

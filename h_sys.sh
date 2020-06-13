@@ -63,6 +63,18 @@ function sys_update(){
     sudo reboot
 }
 
+function sys_check(){
+    for (( i=0 ; i<SYS_NUM ; i++ )) ; do
+        if [ ${SYS_VAL[$i]} -eq 1 ] ; then # rejestr aktywny
+            case "${SYS_COM[$i]}" in
+            "restart") sys_restart ;;
+            "power_off") sys_power_off ;;
+            "update") sys_update ;;
+            esac
+        fi
+    done
+}
+
 function sys_event(){
     if [ $SYS_CNT -eq 0 ] ; then
         if [ $SYS_NUM - eq 0 ] ; then

@@ -24,6 +24,10 @@ function main(){
             sys_event
         fi
         sleep 1
+        if [ $SYS_RELOAD -eq 1 ] ; then
+            echo "przeładowanie systemu"
+            SYS_RELOAD=0
+        fi
     done
 }
 

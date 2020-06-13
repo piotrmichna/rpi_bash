@@ -85,9 +85,7 @@ function gpo_out(){
             fi
         fi
         if [ ${GP_DIR[$GID]} -eq 1 ] ; then
-            echo "gpo_out dir ok"
             if [ $STAN -ne ${GP_STAN[$GID]} ] ; then # zmiana stanu wyjscia jest mozliwa
-                 echo "gpo_out stan ok"
                  gpio write ${GP_GPIO[$GID]} $STAN
                  GP_STAN[$GID]=$STAN
                 if [ $2 -eq 1 ] ; then # stan ON
@@ -132,7 +130,6 @@ function sensor(){
 }
 
 function run_prog() {
-    echo "run_program LP=$PR_ITEM_LP"
     for (( n=0 ; n<PR_ITEM_NUM ; n++ )) ; do
         if [ $PR_ITEM_LP -eq $n ] ; then #wywolanie dla kolejnych etapow programu
             if [ ${GP_DIR[${PR_ITEM_GPID[$n]}]} -eq 1 ] ; then
@@ -140,7 +137,6 @@ function run_prog() {
                 if [ ${PR_ITEM_CNT[$n]} -lt ${PR_ITEM_DELAY[$n]} ] ; then
                     # wysterowanie wyjscia gdy cnt=0
                     if [ ${PR_ITEM_CNT[$n]} -eq 0 ] ; then
-                        echo "wlacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
                         gpo_out "$n" "1"
                         #skok do nastpnego kroku jesli wyscie jest rownolegle
                         PR_ITEM_CNT[$n]=$(( PR_ITEM_CNT[$n]+1 ))
@@ -157,7 +153,6 @@ function run_prog() {
                     fi
                 else
                     # wylaczenie wyjscia cnt=delay
-                    echo "wylacz gpio ${GP_NAZ[${PR_ITEM_GPID[$n]}]}"
                     gpo_out "$n" "0"
                     PR_ITEM_LP=$(( PR_ITEM_LP+1 ))
                 fi
@@ -280,10 +275,8 @@ function get_next_start(){
 
 function wait_for_prog_start(){
     if [ $PR_START_NUM -gt 0 ] ; then # są planowane starty
-        if [ $PR_ID -gt 0 ] ; then # program aktywny
-            echo "program run"
-        else # oczekiwanie na program
-            echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT"
+        if [ $PR_ID -lt 1 ] ; then # oczekiwanie na program
+            echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT  LP=$PR_ITEM_LP"
             if [ $PR_NEXT_TIM_SEC -gt 10 ] ; then # ilosc sekund do startu >10
                 if [ $PR_NEXT_TIM_CNT -eq 0 ] ; then # akutalizacja ilosci sekund do startu
                     PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
@@ -296,7 +289,6 @@ function wait_for_prog_start(){
                 PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
                 if [ $PR_NEXT_TIM_SEC -lt 1 ] ; then
                     PR_ID=$PR_NEXT_PROG_ID
-                    echo "start programu o id=$PR_ID"
                     #wywolanie planowanego programu
                     begin_prog
                 fi
@@ -315,7 +307,6 @@ function wait_for_prog_start(){
 }
 
 function prog_event(){
-    echo "prog_event LP=$PR_ITEM_LP"
     if [ $PR_ITEM_LP -eq -1 ] ; then # program nie aktywny
         wait_for_prog_start
     else # program aktywny

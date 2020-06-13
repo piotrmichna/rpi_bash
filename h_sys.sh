@@ -13,6 +13,13 @@ SYS_COM[0]=""
 SYS_VAL[0]=0
 
 function sys_init(){
+    if [ $SYS_NUM -gt 1 ] ; then
+        for (( i=1 ; i<SYS_NUM ; i++ )) ; do
+            unset SYS_ID[$i]
+            unset SYS_COM[$i]
+            unset SYS_VAL[$i]
+        done
+    fi
     local tmp=$(echo "SELECT COUNT(1) FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     SYS_NUM=${tmp[0]}
     if [ $SYS_NUM -gt 0 ] ; then

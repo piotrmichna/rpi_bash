@@ -63,18 +63,21 @@ function gpio_init(){
     if [ ${GP_DIR[$i]} -eq 1 ] ; then # wyjści sterujące
       if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
         gpio write ${GP_GPIO[$i]} 0 #pulup GND
+        GP_STAN[$i]=0
       else
         gpio write ${GP_GPIO[$i]} 1 #pulup Vcc
+        GP_STAN[$i]=1
       fi
       gpio mode ${GP_GPIO[$i]} out #kierunek wyjściowy
     else  # wejście pomiaru
+    #gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
       if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
-        gpio mode ${GP_GPIO[$i]} down #pulup GND
+        gpio mode ${GP_GPIO[$i]} up #pulup GND
+        GP_STAN[$i]=1
       else
-        gpio mode ${GP_GPIO[$i]} up #pulup Vcc
+        gpio mode ${GP_GPIO[$i]} down #pulup Vcc
+        GP_STAN[$i]=0
       fi
-      gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
     fi
   done
 }
-

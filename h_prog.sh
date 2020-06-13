@@ -80,13 +80,21 @@ function gpo_out(){
         local STAN=$2
         if [ ${GP_DIR[$GID]} -eq 1 ] ; then
             if [ $STAN -ne ${GP_STAN[$GID]} ] ; then # zmiana stanu wyjscia jest mozliwa
-                if [ $STAN -eq 1 ] ; then
-                    gpio write ${GP_GPIO[$GID]} 1
+                if [ $STAN -eq 1 ] ; then # stan ON
+                    if [ ${GP_STAN_ACT[$GID]} -eq 1 ] ; then
+                        gpio write ${GP_GPIO[$GID]} 1
+                    else
+                        gpio write ${GP_GPIO[$GID]} 0
+                    fi
                     log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - on"
-                else
-                    gpio write ${GP_GPIO[$GID]} 0
+                else # stan OFF
+                    if [ ${GP_STAN_ACT[$GID]} -eq 1 ] ; then
+                        gpio write ${GP_GPIO[$GID]} 0
+                    else
+                        gpio write ${GP_GPIO[$GID]} 1
+                    fi
                     log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - off"
-                fi
+                fi #stan
             else
                 # gpio nie jest wyjsciem
                 log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - ponowny ustawienie stanu"

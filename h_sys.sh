@@ -12,7 +12,7 @@ SYS_ID[0]=0
 SYS_COM[0]=""
 SYS_VAL[0]=0
 SYS_DELAY=10
-SYS_CNT=$SYS_DELAY
+SYS_CNT=0
 
 function sys_init(){
     if [ $SYS_NUM -gt 1 ] ; then
@@ -24,7 +24,6 @@ function sys_init(){
     fi
      local tmp=$(echo "SELECT valu FROM cnf WHERE comm='check_delay'" | mysql -D$DB -u $USER -p$PASS -N)
     SYS_DELAY=${tmp[0]}
-    SYS_CNT=$SYS_DELAY
 
     tmp=$(echo "SELECT COUNT(1) FROM cnf WHERE syst=1 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     SYS_NUM=${tmp[0]}
@@ -62,4 +61,16 @@ function sys_update(){
     sleep 10
     log_sys "RESTART systemu"
     sudo reboot
+}
+
+function sys_event(){
+    if [ $SYS_CNT -eq 0 ] ; then
+        if [ $SYS_NUM - eq 0 ] ; then
+            sys_init
+        fi
+        # sprawdzenie funkcji systemowych
+        SYS_CNT=$SYS_DELAY
+    else
+        SYS_CNT=$(( SYS_CNT-1))
+    fi]
 }

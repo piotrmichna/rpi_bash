@@ -13,6 +13,7 @@ SYS_COM[0]=""
 SYS_VAL[0]=0
 SYS_DELAY=10
 SYS_CNT=0
+SYS_RELOAD=0
 
 function sys_init(){
     if [ $SYS_NUM -gt 1 ] ; then
@@ -63,6 +64,11 @@ function sys_update(){
     sudo reboot
 }
 
+function sys_reload(){
+    log_sys "PRZEŁADOWANIE"
+    SYS_RELOAD=1
+}
+
 function sys_check(){
     for (( i=0 ; i<SYS_NUM ; i++ )) ; do
         if [ ${SYS_VAL[$i]} -eq 1 ] ; then # rejestr aktywny
@@ -70,6 +76,7 @@ function sys_check(){
             "restart") sys_restart ;;
             "power_off") sys_power_off ;;
             "update") sys_update ;;
+            "reload") sys_reload ;;
             esac
         fi
     done

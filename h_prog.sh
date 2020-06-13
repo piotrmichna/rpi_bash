@@ -71,6 +71,28 @@ function end_prog(){
     fi
 }
 
+function gpo_out(){
+    # gpo_out LP STAN
+    if [ -z ${1+x} ] && [ -z ${2+x} ] ; then
+        log_sys "er" "fun. gpo_out bez podania parametrów"
+    else
+        local GID=${PR_ITEM_GPID[$1]}
+        local STAN=$2
+        if [ ${GP_DIR[$GID]} -eq 1 ] ; then
+            if [ $STAN -eq 1 ] ; then
+                gpio write ${GP_GPIO[$GID]} 1
+                log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - on"
+            else
+                gpio write ${GP_GPIO[$GID]} 0
+                log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - off"
+            fi
+        else
+            # gpio nie jest wyjsciem
+            log_gp "${GP_GPIO[$GID]}" "1" "${GP_NAZ[$GID]} - nie jest wyscie"
+        fi
+    fi
+}
+
 function sensor(){
     if [ -z ${1+x} ] ; then
         log_sys "er" "sensor bez parametru"

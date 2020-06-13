@@ -1,7 +1,7 @@
 #!/bin/bash
 #___h_prog_gpio.sh___
 
-source /home/pi/homster4/h_log.sh #funkcje zapisu informacj zdazen do bazy danych
+source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_sys "er" "blędna informacja"
 # log_sys "poprawna informacja"
 # log_gp "er" GPIO STAN "blędna informacja"

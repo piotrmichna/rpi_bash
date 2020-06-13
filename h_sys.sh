@@ -77,7 +77,7 @@ function sys_check(){
 
 function sys_event(){
     if [ $SYS_CNT -eq 0 ] ; then
-        if [ $SYS_NUM - eq 0 ] ; then
+        if [ $SYS_NUM -eq 0 ] ; then
             sys_init
         fi
         # sprawdzenie funkcji systemowych
@@ -85,5 +85,5 @@ function sys_event(){
         SYS_CNT=$SYS_DELAY
     else
         SYS_CNT=$(( SYS_CNT-1))
-    fi]
+    fi
 }

@@ -15,11 +15,14 @@ source h_sys.sh
 
 function main(){
     log_sys "START SYSTEMU"
-    sys_init
+
     while [ 1 ] ; do
         #start_test
         prog_event
         #stop_test
+        if [ $PR_ID -lt 0 ] ; then
+            sys_event
+        fi
         sleep 1
     done
 }

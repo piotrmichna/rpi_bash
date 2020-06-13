@@ -314,6 +314,7 @@ function wait_for_prog_start(){
 }
 
 function prog_event(){
+    echo "prog_event LP=$PR_ITEM_LP"
     if [ $PR_ITEM_LP -eq -1 ] ; then # program nie aktywny
         wait_for_prog_start
     else # program aktywny

@@ -16,9 +16,9 @@ function main(){
     log_sys "START SYSTEMU"
 
     while [ 1 ] ; do
-        start_test
+        #start_test
         prog_event
-        stop_test
+        #stop_test
         sleep 1
     done
 }

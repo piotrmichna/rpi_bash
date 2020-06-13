@@ -49,7 +49,7 @@ function end_prog(){
     for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
         if [ ${PR_ITEM_PAR[$i]} -eq 1 ] && [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
             #wylacz wyjscie
-            log_gp "${GP_GPIO[${PR_ITEM_GPID[$i]}]}" "$ret" "zmiana - off"
+            gpo_out "$i" "0"
         fi
         if [ $i -gt 0 ] ; then
             unset PR_ITEM_ID[$i]

@@ -46,7 +46,7 @@ function end_prog(){
     PR_SENS_OK=1
     PR_ITEM_LP=-1
     for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
-        if [ ${PR_ITEM_PAR[$i]} -eq 1 ] && [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
+        if [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
             #wylacz wyjscie
             gpo_out "$i" "0"
         fi

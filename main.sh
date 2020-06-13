@@ -10,6 +10,7 @@ source _test.sh #funkcje testujace czas wykonywania skryptu
 # start_test
 # stop_test
 source h_prog.sh
+source h_sys.sh
 
 
 function main(){
@@ -19,6 +20,9 @@ function main(){
         #start_test
         prog_event
         #stop_test
+        if [ $PR_ID -lt 0 ] ; then
+            sys_event
+        fi
         sleep 1
     done
 }

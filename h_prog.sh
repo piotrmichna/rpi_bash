@@ -253,6 +253,9 @@ function get_next_start(){
     local TNOW=$(date +"%T")
     local tmp=$(echo "SELECT COUNT(1) FROM start_time WHERE tim>'$TNOW' ORDER BY tim" | mysql -D$DB -u $USER -p$PASS -N)
     PR_START_NUM=${tmp[0]}
+    if [ $PR_START_NUM="" ] ; then
+        $PR_START_NUM=-1
+    fi
     echo "ilosc startow $PR_START_NUM"
     if [ $PR_START_NUM -gt 0 ] ; then
         tmp=$(echo "SELECT tim FROM start_time WHERE tim>'$TNOW' ORDER BY tim LIMIT 1" | mysql -D$DB -u $USER -p$PASS -N)

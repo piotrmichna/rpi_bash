@@ -57,7 +57,7 @@ function gpio_list(){
 }
 
 function gpio_init(){
-     log_sys "inicjacja gpio"
+    log_sys "GPIO - inicjacja"
     gpio_get_data #pobranie parametru gpio z bazy danych
     for (( i=0 ; i<GP_NUM ; i++ )) ; do
     if [ ${GP_DIR[$i]} -eq 1 ] ; then # wyjści sterujące

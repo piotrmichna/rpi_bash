@@ -34,7 +34,7 @@ PR_ITEM_CNT[0]=0
 PR_ITEM_GPID[0]=0
 
 function end_prog(){
-    echo "end_prog"
+    log_sys "KONIEC programu [ $PR_NAZ ]"
     PR_NEXT_TIM=""
     PR_NEXT_TIM_SEC=-1
     PR_NEXT_TIM_CNT=-1
@@ -95,10 +95,10 @@ function gpo_out(){
                 fi #stan
             else
                 # gpio nie jest wyjsciem
-                log_gp "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - ponowny ustawienie stanu"
+                log_gp "er" "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - ponowny ustawienie stanu"
             fi
         else
-            log_gp "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - nie jest wyscie"
+            log_gp "er" "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - nie jest wyscie"
         fi
     fi
 }
@@ -215,6 +215,7 @@ function begin_prog(){
         if [ $PR_ITEM_NUM -gt 0 ] ; then
             tmp=$(echo "SELECT nazwa FROM prog WHERE id=$PR_ID" | mysql -D$DB -u $USER -p$PASS -N)
             PR_NAZ=${tmp[0]}
+            log_sys "START programu [ $PR_NAZ ]"
             get_prog_item
         else
             log_sys "er"  "wywolanie pustego programu"
@@ -250,6 +251,7 @@ function is_time_now(){
 }
 
 function get_next_start(){
+    log_sys "TIME - szukanie nastepnych uruchomień"
     local TNOW=$(date +"%T")
     local tmp=$(echo "SELECT COUNT(1) FROM start_time WHERE tim>'$TNOW' ORDER BY tim" | mysql -D$DB -u $USER -p$PASS -N)
     PR_START_NUM=${tmp[0]}
@@ -279,17 +281,18 @@ function get_next_start(){
 function wait_for_prog_start(){
     if [ $PR_START_NUM -gt 0 ] ; then # są planowane starty
         if [ $PR_ID -lt 1 ] ; then # oczekiwanie na program
-            echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT  LP=$PR_ITEM_LP"
             if [ $PR_NEXT_TIM_SEC -gt 10 ] ; then # ilosc sekund do startu >10
                 if [ $PR_NEXT_TIM_CNT -eq 0 ] ; then # akutalizacja ilosci sekund do startu
                     PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
                     PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_SEC/2 ))
+                    echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT  LP=$PR_ITEM_LP"
                 else # odliczanie
                     PR_NEXT_TIM_SEC=$(( PR_NEXT_TIM_SEC-1 ))
                     PR_NEXT_TIM_CNT=$(( PR_NEXT_TIM_CNT-1 ))
                 fi
             else # ilosc sekund do startu <10
                 PR_NEXT_TIM_SEC=$( is_time_now "$PR_NEXT_TIM" )
+                echo "wait for program -> sec: $PR_NEXT_TIM_SEC cnt: $PR_NEXT_TIM_CNT  LP=$PR_ITEM_LP"
                 if [ $PR_NEXT_TIM_SEC -lt 1 ] ; then
                     PR_ID=$PR_NEXT_PROG_ID
                     #wywolanie planowanego programu
@@ -299,7 +302,6 @@ function wait_for_prog_start(){
         fi # oczekiwanie na program
     else # brak startow biezacego dnia
         if [ $NEW_DAY -ne $(date +'%-j') ] ; then # oczekiwanie na nastepny dzien
-            echo "nowy dzien"
             if [ $GP_NUM -eq -1 ] ; then
                 gpio_init
             fi

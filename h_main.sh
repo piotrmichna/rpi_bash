@@ -27,6 +27,7 @@ function main(){
         if [ $SYS_RELOAD -eq 1 ] ; then
             echo "przeładowanie systemu"
             SYS_RELOAD=0
+            sudo systemctl restart homster.service
         fi
     done
 }

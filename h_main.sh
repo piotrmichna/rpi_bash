@@ -25,8 +25,10 @@ function main(){
         fi
         sleep 1
         if [ $SYS_RELOAD -eq 1 ] ; then
-            echo "przeładowanie systemu"
+            log_sys "PRZEŁADOWANIE usługi systemowej"
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE cnf SET valu=0 WHERE comm='reload';"
             SYS_RELOAD=0
+            sudo systemctl restart homster.service
         fi
     done
 }

@@ -18,6 +18,7 @@ CUR_TIM=$(date +"%T")
     if [ "$1" = "er" ] ; then
         local ER=1
         local OPI="$2"
+        echo "${CUR_TIM} - $OPI"
     else
         local ER=0
         local OPI="$1"
@@ -33,6 +34,7 @@ function log_gp(){
         local GPIO=$2
         local STAN=$3
         local OPI="$4"
+        echo "${CUR_TIM} g[${GPIO}] s[${STAN}]- $OPI"
     else
         local ER=0
         local GPIO=$1

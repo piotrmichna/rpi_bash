@@ -53,7 +53,7 @@ function sys_power_off(){
 function sys_update(){
     #bash
     log_sys "AKTUALIZACJA POWŁOKI systemu"
-    cd ~/homster4
+    cd ~/homster_dev
     git checkout master
     git pull bitb master
     #html
@@ -68,7 +68,6 @@ function sys_update(){
 }
 
 function sys_reload(){
-    log_sys "PRZEŁADOWANIE"
     SYS_RELOAD=1
 }
 

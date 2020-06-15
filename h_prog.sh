@@ -88,6 +88,7 @@ function gpo_out(){
             if [ $STAN -ne ${GP_STAN[$GID]} ] ; then # zmiana stanu wyjscia jest mozliwa
                  gpio write ${GP_GPIO[$GID]} $STAN
                  GP_STAN[$GID]=$STAN
+                 mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$STAN WHERE id=${GP_ID[$GID]};"
                 if [ $2 -eq 1 ] ; then # stan ON
                     log_gp "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - on"
                 else # stan OFF

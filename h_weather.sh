@@ -24,7 +24,7 @@ function init_weather(){
     MIN_DELAY=${tmp[0]}
     tmp=$(echo "SELECT valu FROM cnf WHERE comm='hour_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
     HOU_DELAY=${tmp[0]}
-
+    log_sys "Inicjalizacja czujników"
     echo "MIN_DELAY=$MIN_DELAY"
     echo "HOU_DELAY=$HOU_DELAY"
 }

@@ -6,7 +6,7 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_gp "er" GPIO STAN "blędna informacja"
 # log_gp GPIO STAN "poprawna informacja"
 
-MIN_DELAY=0
+MIN_DELAY=-1
 HOU_DELAY=0
 MIN_CNT=0
 HOU_CNT=0
@@ -15,7 +15,7 @@ BME[0]=0
 
 function get_bme(){
     local  tmp=$( ./bme280 )
-    WT_PAR=( $( for i in $tmp ;do echo $i ;done ) )
+    BME=( $( for i in $tmp ;do echo $i ;done ) )
 
     CUR_DAT=$(date +"%F")
     CUR_TIM=$(date +"%T")
@@ -27,9 +27,9 @@ function get_bme_min(){
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
-        echo "temp=${BME[0]}"
-        echo "press=${BME[1]}"
-        echo "humi=${BME[2]}"
+        echo " temp= ${BME[0]}"
+        echo "press= ${BME[1]}"
+        echo " humi= ${BME[2]}"
 
         MIN_CNT=$MIN_DELAY
     else
@@ -56,4 +56,7 @@ function weather_event(){
 	get_bme_min
 }
 
-get_weather
+while [ 1 ] ; do
+    weather_event
+    sleep 1
+done

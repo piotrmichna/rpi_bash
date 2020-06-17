@@ -45,6 +45,7 @@ function init_weather(){
     log_sys "Inicjalizacja czujników"
     echo "MIN_DELAY=$MIN_DELAY"
     echo "HOU_DELAY=$HOU_DELAY"
+    get_bme
 }
 
 

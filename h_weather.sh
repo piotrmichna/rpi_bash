@@ -6,6 +6,9 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_gp "er" GPIO STAN "blędna informacja"
 # log_gp GPIO STAN "poprawna informacja"
 
+MIN_DELAY=0
+HOU_DELAY=0
+
 function get_weather(){
 	while [ 1 ] ; do
 		tmp=$( ./bme280 )

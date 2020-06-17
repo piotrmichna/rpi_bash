@@ -9,6 +9,17 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 MIN_DELAY=0
 HOU_DELAY=0
 
+function init_weather(){
+    local tmp=$(echo "SELECT valu FROM cnf WHERE comm='min_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
+    MIN_DELAY=${tmp[0]}
+    tmp=$(echo "SELECT valu FROM cnf WHERE comm='hour_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
+    HOU_DELAY=${tmp[0]}
+
+    echo "MIN_DELAY=$MIN_DELAY"
+    echo "HOU_DELAY=$HOU_DELAY"
+}
+
+
 function get_weather(){
 	while [ 1 ] ; do
 		tmp=$( ./bme280 )
@@ -22,4 +33,5 @@ function get_weather(){
 		sleep 3
 	done
 }
+
 get_weather

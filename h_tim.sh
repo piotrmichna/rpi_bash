@@ -48,3 +48,16 @@ function get_tim_from_S(){
 		echo "$tim"
 	fi
 }
+
+function get_date_from_S(){
+	local dat=""
+	if [ -z $1 ] || [[ $1 =~ '^[0-9]+$' ]] ; then
+        echo ""
+    else
+		if [ $1 -gt 0 ] ; then
+			dat=$(date -d @$1 "+%F")
+		fi
+		echo "$dat"
+	fi
+}
+

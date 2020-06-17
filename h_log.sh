@@ -5,6 +5,7 @@ USER="pituEl"
 PASS="hi24biscus"
 DB="homster"
 DBH="homhist"
+DBW="homsweather"
 
 #---zmienne globalen daty i czasu
 CUR_DAT=$(date +"%F")

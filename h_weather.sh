@@ -49,18 +49,11 @@ function init_weather(){
 }
 
 
-function get_weather(){
-	while [ 1 ] ; do
-		tmp=$( ./bme280 )
-
-		WT_PAR=( $( for i in $tmp ;do echo $i ;done ) )
-		WT_PAR[3]=0
-		echo " temp= ${WT_PAR[0]}"
-		echo "press= ${WT_PAR[1]}"
-		echo " high= ${WT_PAR[2]}"
-		echo "------"
-		sleep 3
-	done
+function weather_event(){
+    if [ $MIN_DELAY -eq -1 ] ; then
+        init_weather
+    fi
+	get_bme_min
 }
 
 get_weather

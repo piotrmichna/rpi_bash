@@ -11,6 +11,7 @@ source h_test.sh #funkcje testujace czas wykonywania skryptu
 # stop_test
 source h_prog.sh
 source h_sys.sh
+source h_weather.sh
 
 
 function main(){
@@ -18,6 +19,7 @@ function main(){
 
     while [ 1 ] ; do
         #start_test
+        weather_event
         prog_event
         #stop_test
         if [ $PR_ID -lt 0 ] ; then

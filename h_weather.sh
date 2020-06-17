@@ -8,6 +8,8 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 
 MIN_DELAY=0
 HOU_DELAY=0
+MIN_CNT=0
+HOU_CNT=0
 
 BME[0]=0
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#---h_weather.sh-----
+
 source h_prog_gpio.sh
 # gpio_get_data #pobiera pramtry gpio z mysql
 # gpio_list # wyswietla na ekranie liste dostepnych portow
@@ -18,4 +18,3 @@ function get_weather(){
 	done
 }
 get_weather
-

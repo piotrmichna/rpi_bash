@@ -15,8 +15,7 @@ function get_bme(){
     local  tmp=$( ./bme280 )
     BME=( $( for i in $tmp ;do echo $i ;done ) )
 
-    CUR_DAT=$(date +"%F")
-    CUR_TIM=$(date +"%T")
+    CUR_DATTIME=$(date +"%s")
 }
 
 function get_bme_min(){
@@ -26,9 +25,9 @@ function get_bme_min(){
         CUR_MIN_MOD_DELAY=$(( CUR_MIN_MOD_DELAY%MIN_DELAY ))
         if [ $CUR_MIN_MOD_DELAY -eq 0 ] ; then
             get_bme
-            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
-            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
-            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dattim, tem) VALUES (NULL, $CUR_DATTIME, '${BME[0]}');"
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dattim, press) VALUES (NULL, $CUR_DATTIME, '${BME[1]}');"
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dattim, humi) VALUES (NULL, $CUR_DATTIME, '${BME[2]}');"
             #echo " temp= ${BME[0]}"
             #echo "press= ${BME[1]}"
             #echo " humi= ${BME[2]}"

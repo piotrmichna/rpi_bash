@@ -36,3 +36,15 @@ echo "        TIM_A = $TIM_A"
 tim=0
 temp=$(date -d @$tim "+%F %T")
 echo "data od 542 -> $temp"
+
+function get_tim_from_S(){
+	local tim=""
+	if [ -z $1 ] || [[ $1 =~ '^[0-9]+$' ]] ; then
+        echo ""
+    else
+		if [ $1 -gt 0 ] ; then
+			tim=$(date -d @$1 "+%T")
+		fi
+		echo "$tim"
+	fi
+}

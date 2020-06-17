@@ -21,6 +21,22 @@ function get_bme(){
     CUR_TIM=$(date +"%T")
 }
 
+function get_bme_min(){
+    if [ $MIN_CNT -eq 0 ] ; then
+        get_bme
+        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
+        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
+        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
+        echo "temp=${BME[0]}"
+        echo "press=${BME[1]}"
+        echo "humi=${BME[2]}"
+
+        MIN_CNT=$MIN_DELAY
+    else
+        MIN_CNT=$(( MIN_CNT-1 ))
+    fi
+}
+
 function init_weather(){
     local tmp=$(echo "SELECT valu FROM cnf WHERE comm='min_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
     MIN_DELAY=${tmp[0]}

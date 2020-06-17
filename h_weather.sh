@@ -9,6 +9,16 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 MIN_DELAY=0
 HOU_DELAY=0
 
+BME[0]=0
+
+function get_bme(){
+    local  tmp=$( ./bme280 )
+    WT_PAR=( $( for i in $tmp ;do echo $i ;done ) )
+
+    CUR_DAT=$(date +"%F")
+    CUR_TIM=$(date +"%T")
+}
+
 function init_weather(){
     local tmp=$(echo "SELECT valu FROM cnf WHERE comm='min_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
     MIN_DELAY=${tmp[0]}

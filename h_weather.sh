@@ -7,9 +7,7 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_gp GPIO STAN "poprawna informacja"
 
 MIN_DELAY=-1
-HOU_DELAY=0
-MIN_CNT=0
-HOU_CNT=0
+HOU_DELAY=-1
 
 BME[0]=0
 
@@ -22,18 +20,19 @@ function get_bme(){
 }
 
 function get_bme_min(){
-    if [ $MIN_CNT -eq 0 ] ; then
-        get_bme
-        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
-        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
-        mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
-        #echo " temp= ${BME[0]}"
-        #echo "press= ${BME[1]}"
-        #echo " humi= ${BME[2]}"
-
-        MIN_CNT=$MIN_DELAY
-    else
-        MIN_CNT=$(( MIN_CNT-1 ))
+    local CUR_SEC=$(date +"%-S")
+    if [ $CUR_SEC -eq 0 ] ; then
+        local CUR_MIN_MOD_DELAY=$(date +"%-M")
+        CUR_MIN_MOD_DELAY=$(( CUR_MIN_MOD_DELAY%MIN_DELAY ))
+        if [ $CUR_MIN_MOD_DELAY -eq 0 ] ; then
+            get_bme
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
+            mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
+            #echo " temp= ${BME[0]}"
+            #echo "press= ${BME[1]}"
+            #echo " humi= ${BME[2]}"
+        fi
     fi
 }
 

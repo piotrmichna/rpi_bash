@@ -27,9 +27,9 @@ function get_bme_min(){
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dat, tim, tem) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[0]}');"
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dat, tim, press) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[1]}');"
         mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dat, tim, humi) VALUES (NULL, '$CUR_DAT', '$CUR_TIM', '${BME[2]}');"
-        echo " temp= ${BME[0]}"
-        echo "press= ${BME[1]}"
-        echo " humi= ${BME[2]}"
+        #echo " temp= ${BME[0]}"
+        #echo "press= ${BME[1]}"
+        #echo " humi= ${BME[2]}"
 
         MIN_CNT=$MIN_DELAY
     else
@@ -55,8 +55,3 @@ function weather_event(){
     fi
 	get_bme_min
 }
-
-while [ 1 ] ; do
-    weather_event
-    sleep 1
-done

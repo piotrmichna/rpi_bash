@@ -36,7 +36,8 @@ function get_bme(){
 
 function get_bme_min(){
     local CUR_SEC=$(date +"%-S")
-    if [ $CUR_SEC -eq 0 ] ; then
+		get_bme
+    if [ $CUR_SEC -eq 0 ] && [ $MIN_DELAY -gt 0 ] ; then
         local CUR_MIN_MOD_DELAY=$(date +"%-M")
         CUR_MIN_MOD_DELAY=$(( CUR_MIN_MOD_DELAY%MIN_DELAY ))
         if [ $CUR_MIN_MOD_DELAY -eq 0 ] ; then
@@ -73,10 +74,21 @@ function init_weather(){
     MIN_DELAY=${tmp[0]}
     tmp=$(echo "SELECT valu FROM cnf WHERE comm='hour_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
     HOU_DELAY=${tmp[0]}
+		if [ $MIN_DELAY -gt 0 ] ; then
+			MIN_DIV=$(( MIN_DLAY*30 ))
+		fi
+		local tmp=$(echo "SELECT valu FROM cnf WHERE comm='temp_min'" | mysql -D$DBW -u $USER -p$PASS -N)
+    T_MIN=${tmp[0]}
+		tmp=$(echo "SELECT valu FROM cnf WHERE comm='temp_max'" | mysql -D$DBW -u $USER -p$PASS -N)
+    T_MAX=${tmp[0]}
+		tmp=$(echo "SELECT valu FROM cnf WHERE comm='humi_min'" | mysql -D$DBW -u $USER -p$PASS -N)
+    H_MIN=${tmp[0]}
+		tmp=$(echo "SELECT valu FROM cnf WHERE comm='humi_max'" | mysql -D$DBW -u $USER -p$PASS -N)
+    H_MAX=${tmp[0]}
     log_sys "Inicjalizacja czujników"
     echo "MIN_DELAY=$MIN_DELAY"
     echo "HOU_DELAY=$HOU_DELAY"
-    get_bme
+    tmp=$( ./bme280 )
 }
 
 function temp_is(){

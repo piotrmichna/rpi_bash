@@ -19,12 +19,16 @@ function main(){
 
     while [ 1 ] ; do
         #start_test
-        weather_event
+        #weather_event
         prog_event
         #stop_test
         if [ $PR_ID -lt 0 ] ; then
             sys_event
         fi
+				get_bme
+				H=$( humi_is )
+				T=$( temp_is )
+
         sleep 1
         if [ $SYS_RELOAD -eq 1 ] ; then
             log_sys "PRZEŁADOWANIE usługi systemowej"

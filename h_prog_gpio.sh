@@ -10,12 +10,86 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 GP_NUM=-1
 GP_ID[0]=0
 GP_NAZ[0]=""
-GP_TYPID[0]=0
-GP_TYPNAZ[0]=""
 GP_GPIO[0]=0
 GP_DIR[0]=0
 GP_STAN[0]=0
 GP_STAN_ACT[0]=0
+GP_DELAY[0]=0
+GP_CNT[0]=0
+
+function sensor(){
+    # STAN = sensor "NAZWA"
+    if [ -z ${1+x} ] ; then
+        log_sys "er" "sensor bez parametru"
+        echo "-1"
+    else
+        local GID=0
+        for (( i=0 ; i<GP_NUM ; i++ )) ; do
+            if [ ${GP_NAZ[$i]} = $1 ] ; then
+                GID=$i
+                break;
+            fi
+        done
+
+        local ret=$( gpio read ${GP_GPIO[$GID]} )
+        if [ $ret -ne $GP_STAN[$GID] ] ; then
+            GP_STAN[$GID]=$ret
+            if [ ${GP_STAN[$GID]} -eq ${GP_STAN_ACT[$GID]} ] ; then
+                log_gp "${GP_GPIO[$GID]}" "$ret" "stan poprawny"
+            else
+                echo
+                log_gp "${GP_GPIO[$GID]}" "$ret" "stan negatywny"
+            fi
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=${GP_STAN[$GID]} WHERE id=${GP_ID[$GID]};"
+        fi
+         if [ $GP_STAN[$GID]= -eq ${GP_STAN_ACT[$GID]} ] ; then
+            echo "1"
+        else
+            echo "0"
+        fi
+    fi
+}
+
+function gpo_out(){
+    # gpo_out "naz" STAN[ 1=on 0=off ]
+    if [ -z ${1+x} ] && [ -z ${2+x} ] ; then
+        log_sys "er" "fun. gpo_out bez podania parametrów"
+    else
+        local GID=0
+        local STAN=$2
+        for (( i=0 ; i<GP_NUM ; i++ )) ; do
+            if [ ${GP_NAZ[$i]} = $1 ] ; then
+                GID=$i
+                break;
+            fi
+        done
+        # dostosowanie stanow wlaczenia do polaryzacji
+        if [ ${GP_STAN_ACT[$GID]} -ne 1 ] ; then
+            if [ $STAN -eq 1 ] ; then
+                STAN=0
+            else
+                STAN=1
+            fi
+        fi
+        if [ ${GP_DIR[$GID]} -eq 1 ] ; then
+            if [ $STAN -ne ${GP_STAN[$GID]} ] ; then # zmiana stanu wyjscia jest mozliwa
+                gpio write ${GP_GPIO[$GID]} $STAN
+                GP_STAN[$GID]=$STAN
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=$STAN WHERE id=${GP_ID[$GID]};"
+                if [ $2 -eq 1 ] ; then # stan ON
+                    log_gp "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - on"
+                else # stan OFF
+                    log_gp "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - off"
+                fi #stan
+            else
+                # gpio nie jest wyjsciem
+                log_gp "er" "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - ponowny ustawienie stanu"
+            fi
+        else
+            log_gp "er" "${GP_GPIO[$GID]}" "$STAN" "${GP_NAZ[$GID]} - nie jest wyscie"
+        fi
+    fi
+}
 
 function gpio_get_data(){
     local tmp=$(echo "SELECT id FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
@@ -37,16 +111,13 @@ function gpio_get_data(){
     tmp=$(echo "SELECT stan_act FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
     GP_STAN_ACT=( $( for i in $tmp ;do echo $i ;done ) )
 
+    tmp=$(echo "SELECT delay_s FROM item WHERE en>0 ORDER BY id" | mysql -D$DB -u $USER -p$PASS -N)
+    GP_DELAY=( $( for i in $tmp ;do echo $i ;done ) )
+
     #----pobieranie nazw gpio----------
     for (( i=0 ; i<GP_NUM ; i++ )) ; do
         tmp=$(echo "SELECT nazwa FROM item WHERE id=${GP_ID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
         GP_NAZ[$i]=${tmp[0]}
-    done
-
-    #------pobieranie nazw typow--------
-    for (( i=0 ; i<GP_NUM ; i++ )) ; do
-        tmp=$(echo "SELECT nazwa FROM item_typ WHERE id=${GP_TYPID[$i]}" | mysql -D$DB -u $USER -p$PASS -N)
-        GP_TYPNAZ[$i]=${tmp[0]}
     done
 }
 
@@ -81,3 +152,4 @@ function gpio_init(){
     fi
   done
 }
+

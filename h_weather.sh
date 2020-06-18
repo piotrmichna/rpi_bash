@@ -28,10 +28,10 @@ function get_bme(){
     mysql -D$DBW -u $USER -p$PASS -N -e"UPDATE bme set valu='${BME[0]}' WHERE para='temp';"
     mysql -D$DBW -u $USER -p$PASS -N -e"UPDATE bme set valu='${BME[1]}' WHERE para='press';"
     mysql -D$DBW -u $USER -p$PASS -N -e"UPDATE bme set valu='${BME[2]}' WHERE para='humi';"
-    BME_AVT[$BME_AV_NUM]=${BME[0]}
-    BME_AVP[$BME_AV_NUM]=${BME[1]}
-    BME_AVH[$BME_AV_NUM]=${BME[2]}
-		BME_AV_NUM=$(( BME_AV_NUM+1 ))
+    BME_AVT[$BME_AV_NUM]=$(echo "${BME[0]}*10" | bc)
+    BME_AVP[$BME_AV_NUM]=$(echo "${BME[1]}*10" | bc)
+    BME_AVH[$BME_AV_NUM]=$(echo "${BME[2]}*10" | bc)
+		BME_AV_NUM=$(( BME_AV_NUM+1 ))	
 }
 
 function get_bme_min(){
@@ -45,26 +45,25 @@ function get_bme_min(){
 						local p=0
 						local h=0
             for (( i=0 ; i<BME_AV_NUM ; i++ )) ; do
-							t=$(( t+BME_AVT[$i} ))
-							p=$(( p+BME_AVP[$i] ))
-							h=$(( p+BME_AVH[$i] ))
-							unset BME_AVT[$i]
-							unset BME_AVP[$i]
-							unset BME_AVH[$i]
+							t=$( echo "$t+${BME_AVT[$i]}" | bc )
+							p=$( echo "$p+${BME_AVP[$i]}" | bc )
+							h=$( echo "$h+${BME_AVH[$i]}" | bc )
+							if [ $i -gt 0 ] ; then
+								unset BME_AVT[$i]
+								unset BME_AVP[$i]
+								unset BME_AVH[$i]
+							fi
 						done
-						BME[0]=$(( t/BME_AV_NUM ))
-						BME[1]=$(( p/BME_AV_NUM ))
-						BME[2]=$(( h/BME_AV_NUM ))
+						BME[0]=$( echo "scale=1;$t/$BME_AV_NUM/10.0" | bc )
+						BME[1]=$( echo "scale=1;$p/$BME_AV_NUM/10.0" | bc )
+						BME[2]=$( echo "scale=1;$h/$BME_AV_NUM/10.0" | bc )
 						BME_AV_NUM=0
     				CUR_DATTIME=$(date +"%s")
-						CUR_DATTIME=$(( CUR_DAT_TIME-MIN_DIV ))
+						CUR_DATTIME=$(( CUR_DATTIME-MIN_DIV ))
 
     				mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dattim, tem) VALUES (NULL, $CUR_DATTIME, '${BME[0]}');"
     				mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO press_min (id, dattim, press) VALUES (NULL, $CUR_DATTIME, '${BME[1]}');"
-    				mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dattim, humi) VALUES (NULL, $CUR_DATTIME, '${BME[2]}');"
-            echo " temp= ${BME[0]}"
-            echo "press= ${BME[1]}"
-            echo " humi= ${BME[2]}"
+ 	  				mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO humi_min (id, dattim, humi) VALUES (NULL, $CUR_DATTIME, '${BME[2]}');"
         fi
     fi
 }
@@ -75,7 +74,7 @@ function init_weather(){
     tmp=$(echo "SELECT valu FROM cnf WHERE comm='hour_delay'" | mysql -D$DBW -u $USER -p$PASS -N)
     HOU_DELAY=${tmp[0]}
 		if [ $MIN_DELAY -gt 0 ] ; then
-			MIN_DIV=$(( MIN_DLAY*30 ))
+			MIN_DIV=$(( MIN_DELAY*30 ))
 		fi
 		local tmp=$(echo "SELECT valu FROM cnf WHERE comm='temp_min'" | mysql -D$DBW -u $USER -p$PASS -N)
     T_MIN=${tmp[0]}
@@ -105,7 +104,7 @@ function humi_is(){
 	if [ ${BME[2]} -lt $T_MIN ] && [ $HUM -eq 0 ] ; then
 		HUM=1
 	fi
-	if [ ${BME[2]} -gt $T_MAX ] && [ $HUMM -eq 1 ] ; then
+	if [ ${BME[2]} -gt $T_MAX ] && [ $HUM -eq 1 ] ; then
 		HUM=0
 	fi
 	echo "$HUM"

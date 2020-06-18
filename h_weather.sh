@@ -117,3 +117,8 @@ function weather_event(){
     fi
 	get_bme_min
 }
+
+while [ 1 ] ; do
+	weather_event
+	sleep 1
+done

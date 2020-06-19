@@ -39,6 +39,10 @@ function pl_init(){
     PL_STOP_N=${tmp[0]}
     PL_STAN=0
     mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
+    EZ_BUZ_CNT=0
+    PMP_BUZ_CNT=0
+    PL_START_CNT=0
+    PL_STOP_CNT=0
 }
 
 function wylewanie() {

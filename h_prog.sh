@@ -30,6 +30,8 @@ PL_STOP_CNT=0
 
 BUZ_STAN=0
 WENT_STAN=0
+GRZA_STAN=0
+
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
     EZ_BUZ_TIM=${tmp[0]}
@@ -136,6 +138,23 @@ function plukanie(){
             if [ $PL_STAN -eq 0 ] ; then
                 echo "rozpoczecie garowania"
                 TRYB=3
+            fi
+        fi
+    fi
+}
+
+function ogrzewanie(){
+     if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie ogrzewaniem bez stanu"
+    else
+        if [ $GRZA_STAN -ne $1 ] ; then
+            GRZA_STAN=$1
+            gpo_out "grza" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nagrzewanie', valu=$1 WHERE comm='grza_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='grza_stan';"
             fi
         fi
     fi

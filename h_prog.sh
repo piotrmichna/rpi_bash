@@ -21,7 +21,7 @@ EZ_BUZ_TIM=0         #czas napelnienia buzaw
 PM_PMP_TIM=0    #czas oproznienia buzaw
 PL_START_N=0          # ilosc plukan na starcie
 PL_STOP_N=0            #ilosc plukani na stop
-PL_STAN=0                 # stan funkcji plukania 1= NAPELNIANIE 2= WYLEANIE 0=KONIEC
+PL_STAN=0                 # stan funkcji plukania 1= WYLEANIE 2= NAPELNIANIE 3=KONIEC
 
 EZ_BUZ_CNT=0
 PMP_BUZ_CNT=0
@@ -39,6 +39,21 @@ function pl_init(){
     PL_STOP_N=${tmp[0]}
     PL_STAN=0
     mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
+}
+
+function napelnianie() {
+    if [ $EZ_BUZ_CNT -eq 0 ] ; then
+        gpo_out "ez_buz" 0
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Buzawy pelne' WHERE comm='pl_info';"
+        PL_STAN=3
+    else
+        if [ $EZ_BUZ_CNT -eq $EZ_BUZ_TIM ] ; then
+            gpo_out "ez_buz" 1
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Napełnianie wodą buzaw' WHERE comm='pl_info';"
+        else
+            EZ_BUZ_CNT=$(( EZ_BUZ_CNT-1 ))
+        fi
+    fi
 }
 
 function plukanie(){

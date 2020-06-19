@@ -148,14 +148,16 @@ function buzawa(){
         if [ $BUZ_STAN -ne $1 ] ; then
             BUZ_STAN=$1
             gpo_out "buz" $1
-            local info="NULL"
+            local info=NULL
             if [ $1 -eq 1 ] ; then
-                info="Praca buzawy"
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca buzawy', valu=$1 WHERE comm='buz_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='buz_stan';"
             fi
-            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='$info' valu=$1 WHERE comm='buz_stan';"
         fi
     fi
 }
+
 tcnt=4
 
 while [ 1 ] ; do

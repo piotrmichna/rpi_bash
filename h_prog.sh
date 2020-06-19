@@ -30,12 +30,15 @@ PL_STOP_CNT=0
 
 BUZ_STAN=0
 WENT_STAN=0
+WENT_STOP_TIM=0
+WENT_STOP_CNT=0
 GRZA_STAN=0
 OSW_STAN=0
 PRAD_BUZ=0
 ZB_GRZA=0
 SENS_NEW=0
 ERR=0
+TEMP=0
 
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -186,14 +189,22 @@ function wentylator(){
      if [ -z ${1+x} ] ; then
         log_sys "er" "setowanie wentylatorem bez stanu"
     else
-        if [ $WENT_STAN -ne $1 ] ; then
-            WENT_STAN=$1
-            gpo_out "went" $1
-            local info=NULL
-            if [ $1 -eq 1 ] ; then
+        local info=NULL
+        if [ $1 -eq 1 ] ; then
+            if [ $WENT_STAN -ne $1 ] ; then
+                WENT_STAN=1
+                WENT_STOP_CNT=$WENT_STOP_TIM
+                WENT_STOP_CNT=$(( WENT_STOP_CNT-1 ))
+                gpo_out "went" 1
                 mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nadmuch', valu=$1 WHERE comm='went_stan';"
-            else
+            fi
+        else
+            if [ $WENT_STOP_CNT -eq 0 ] ; then
+                WENT_STAN=0
+                gpo_out "went" 0
                 mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='went_stan';"
+            else
+                WENT_STOP_CNT=$(( WENT_STOP_CNT-1 ))
             fi
         fi
     fi

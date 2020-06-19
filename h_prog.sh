@@ -25,6 +25,7 @@ PL_STOP_N=0            #ilosc plukani na stop
 PL_STAN=0                 # stan funkcji plukania 0=START WYLEWANIA 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
 
 EZ_BUZ_CNT=0
+EZ_BUZ_STAN=0
 PMP_BUZ_CNT=0
 PL_START_CNT=0
 PL_STOP_CNT=0
@@ -268,9 +269,40 @@ function temperatura(){
     fi
 }
 
+function wilgotnosc(){
+    weather_event
+    local wil=$( echo "${BME[2]}/1" | bc )
+    echo "hmin $H_MIN"
+    echo "Hmax $H_MAX"
+    echo "wilgotnosc $wil"
+    if [ $wil -lt $H_MIN ] ; then
+        buzawa 1
+        wentylator 1
+    fi
+    if [ $BUZ_STAN -eq 1 ] ; then
+        prad_buzawa
+        if [ $PRAD_BUZ -eq 1 ] ; then
+            gpo_out "ez_buz" 1
+            EZ_BUZ_STAN=1
+        else
+            gpo_out "ez_buz" 0
+            EZ_BUZ_STAN=0
+        fi
+    fi
+    if [ $EZ_BUZ_STAN -eq 0 ] ; then
+        if [ $BUZ_STAN -eq 1 ] ; then
+            if [ $wil -gt $H_MAX ] ; then
+                buzawa 0
+                wentylator 0
+                BUZ_STAN=0
+            fi
+        fi
+    fi
+}
+
 gpio_init
 while [ 1 ] ; do
-    temperatura
+    wilgotnosc
     sleep 1
 done
 tcnt=4

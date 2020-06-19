@@ -31,6 +31,7 @@ PL_STOP_CNT=0
 BUZ_STAN=0
 WENT_STAN=0
 GRZA_STAN=0
+OSW_STAN=0
 
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -138,6 +139,23 @@ function plukanie(){
             if [ $PL_STAN -eq 0 ] ; then
                 echo "rozpoczecie garowania"
                 TRYB=3
+            fi
+        fi
+    fi
+}
+
+function oswietlenie(){
+        if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie oświetleniem bez stanu"
+    else
+        if [ $OSW_STAN -ne $1 ] ; then
+            OSW_STAN=$1
+            gpo_out "osw" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Oświetlenie', valu=$1 WHERE comm='osw_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='osw_stan';"
             fi
         fi
     fi

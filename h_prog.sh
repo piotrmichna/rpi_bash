@@ -58,7 +58,11 @@ function pl_init(){
     PL_START_CNT=0
     PL_STOP_CNT=0
 }
-
+function praca_init(){
+    echo "praca_init"
+    local tmp=$(echo "SELECT valu FROM prog WHERE comm='wetn_stop_tim'" | mysql -D$DB -u $USER -p$PASS -N)
+    WENT_STOP_TIM=${tmp[0]}
+}
 function wylewanie() {
     if [ $PMP_BUZ_CNT -eq 0 ] ; then
         gpo_out "pmp_buz" 0

@@ -33,42 +33,6 @@ PR_ITEM_DELAY[0]=0
 PR_ITEM_CNT[0]=0
 PR_ITEM_GPID[0]=0
 
-function end_prog(){
-    log_sys "KONIEC programu [ $PR_NAZ ]"
-    PR_NEXT_TIM=""
-    PR_NEXT_TIM_SEC=-1
-    PR_NEXT_TIM_CNT=-1
-    PR_NEXT_TIM_ELSP=""
-    PR_NEXT_PROG_ID=-1
-    PR_ID=-1
-    PR_NAZ=""
-    # zmienne urzadzen
-    PR_SENS_OK=1
-    PR_ITEM_LP=-1
-    for (( i=0 ; i<PR_ITEM_NUM ; i++ )) ; do
-        if [ ${GP_DIR[${PR_ITEM_GPID[$i]}]} -eq 1 ] ; then
-            #wylacz wyjscie
-            gpo_out "$i" "0"
-        fi
-        if [ $i -gt 0 ] ; then
-            unset PR_ITEM_ID[$i]
-            unset PR_ITEM_PAR[$i]
-            unset PR_ITEM_DELAY[$i]
-            unset PR_ITEM_CNT[$i]
-            unset PR_ITEM_GPID[$i]
-        fi
-    done
-    PR_ITEM_NUM=0
-    PR_ITEM_ID[0]=0
-    PR_ITEM_PAR[0]=0
-    PR_ITEM_DELAY[0]=0
-    PR_ITEM_CNT[0]=0
-    PR_ITEM_GPID[0]=0
-
-    if [ $PR_START_NUM -gt 0 ] ; then # sprawdz czy jest kolejny start
-        get_next_start
-    fi
-}
 
 function gpo_out(){
     # gpo_out LP STAN

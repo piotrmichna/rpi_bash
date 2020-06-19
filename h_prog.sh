@@ -18,10 +18,10 @@ TNOW=$(date +"%T") #zminna zawierający aktualny czas
 TRYB=-1
 
 EZ_BUZ_TIM=0         #czas napelnienia buzaw
-PM_PMP_TIM=0    #czas oproznienia buzaw
+PMP_BUZ_TIM=0    #czas oproznienia buzaw
 PL_START_N=0          # ilosc plukan na starcie
 PL_STOP_N=0            #ilosc plukani na stop
-PL_STAN=0                 # stan funkcji plukania 1= WYLEANIE 2= NAPELNIANIE 3=KONIEC
+PL_STAN=0                 # stan funkcji plukania 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
 
 EZ_BUZ_CNT=0
 PMP_BUZ_CNT=0
@@ -45,7 +45,7 @@ function napelnianie() {
     if [ $EZ_BUZ_CNT -eq 0 ] ; then
         gpo_out "ez_buz" 0
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Buzawy pelne' WHERE comm='pl_info';"
-        PL_STAN=3
+        PL_STAN=4
     else
         if [ $EZ_BUZ_CNT -eq $EZ_BUZ_TIM ] ; then
             gpo_out "ez_buz" 1

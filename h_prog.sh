@@ -13,6 +13,7 @@ source h_prog_gpio.sh
 source h_test.sh #funkcje testujace czas wykonywania skryptu
 # start_test
 # stop_test
+source h_weather.sh
 
 TNOW=$(date +"%T") #zminna zawierający aktualny czas
 TRYB=-1 # -1 inicjalizacja 0 plukanie start 1 praca 2 plukanie na koniec 3 koniec
@@ -242,6 +243,36 @@ function zb_grzawlki(){
     fi
 }
 
+function temperatura(){
+    weather_event
+    zb_grzalki
+    local tem=$( echo "${BME[0]}/1" | bc )
+    echo "tmin $T_MIN"
+    echo "tmax $T_MAX"
+    echo "temperatura $tem"
+    if [ $tem -lt $T_MIN ] ; then
+        if [ $ZB_GRZA -eq 1 ] ; then
+            ogrzewanie 1
+            wentylator 1
+        fi
+    fi
+    if [ $ZB_GRZA -eq 0 ] ; then
+        ogrzewanie 0
+        wentylator 0
+        ERR=1
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Błąd zabezpieczenia grzałki' WHERE comm='er';"
+    fi
+    if [ $tem -gt $T_MAX ] ; then
+        ogrzewanie 0
+        wentylator 0
+    fi
+}
+
+gpio_init
+while [ 1 ] ; do
+    temperatura
+    sleep 1
+done
 tcnt=4
 while [ 1 ] ; do
     if [ $TRYB -eq -1 ] ; then

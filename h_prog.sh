@@ -46,10 +46,12 @@ function wylewanie() {
         gpo_out "pmp_buz" 0
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Buzawy pusta' WHERE comm='pl_info';"
         PL_STAN=2
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
     else
         if [ $PMP_BUZ_CNT -eq $PMP_BUZ_TIM ] ; then
             gpo_out "pmp_buz" 1
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Wylewanie wody z buzaw' WHERE comm='pl_info';"
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
         else
             $PMP_BUZ_CNT=$(( PMP_BUZ_CNT-1 ))
         fi
@@ -60,10 +62,12 @@ function napelnianie() {
         gpo_out "ez_buz" 0
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Buzawy pelne' WHERE comm='pl_info';"
         PL_STAN=4
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
     else
         if [ $EZ_BUZ_CNT -eq $EZ_BUZ_TIM ] ; then
             gpo_out "ez_buz" 1
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Napełnianie wodą buzaw' WHERE comm='pl_info';"
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
         else
             EZ_BUZ_CNT=$(( EZ_BUZ_CNT-1 ))
         fi

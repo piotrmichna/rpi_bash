@@ -28,6 +28,8 @@ PMP_BUZ_CNT=0
 PL_START_CNT=0
 PL_STOP_CNT=0
 
+BUZ_STAN=0
+
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
     EZ_BUZ_TIM=${tmp[0]}
@@ -139,6 +141,21 @@ function plukanie(){
     fi
 }
 
+function buzawa(){
+    if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie buzawy bez stanu"
+    else
+        if [ $BUZ_STAN -ne $1 ] ; then
+            BUZ_STAN=$1
+            gpo_out "buz" $1
+            local info="NULL"
+            if [ $1 -eq 1 ] ; then
+                info="Praca buzawy"
+            fi
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='$info' valu=$1 WHERE comm='buz_stan';"
+        fi
+    fi
+}
 tcnt=4
 
 while [ 1 ] ; do

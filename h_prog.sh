@@ -71,25 +71,76 @@ function napelnianie() {
     else
         if [ $EZ_BUZ_CNT -eq $EZ_BUZ_TIM ] ; then
             gpo_out "ez_buz" 1
+            PL_STAN=3
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Napełnianie wodą buzaw' WHERE comm='pl_info';"
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
-        else
-            EZ_BUZ_CNT=$(( EZ_BUZ_CNT-1 ))
         fi
+        EZ_BUZ_CNT=$(( EZ_BUZ_CNT-1 ))
     fi
 }
 
 function plukanie(){
-    if [ $TRYB -eq 0 ] || [ $TRYB -eq 2 ] ; then
-        if $TRYB -eq 0 ] ; then # PLUKANIE NA START
-            echo "plukanie na start"
-            TRYB=1
-        else # PLUKANIE NA STOP
-            echo "plukanie na stop"
-            TRYB=3
+    if [ $TRYB -eq 0 ] ; then # PLUKANIE NA START
+        echo "plukanie na START"
+        if [ $PL_START_CNT -lt $PL_START_N ] ; then
+            if [ $PL_STAN -lt 4 ] ; then
+                if [ $PL_STAN -lt 2 ] ; then
+                    if [ $PL_STAN -eq 0 ] && [ $PMP_BUZ_CNT -eq 0 ] ; then
+                        PMP_BUZ_CNT=$PMP_BUZ_TIM
+                        echo "wylewanie"
+                    fi
+                    wylewanie
+                else
+                    if [ $PL_STAN -eq 2 ] && [ $EZ_BUZ_CNT -eq 0 ] ; then
+                        EZ_BUZ_CNT=$EZ_BUZ_TIM
+                        echo "napelnianie"
+                    fi
+                    napelnianie
+                fi
+            else
+                PL_STAN=0
+                PL_START_CNT=$(( PL_START_CNT+1 ))
+            fi
+        else
+            if [ $PL_STAN -eq 0 ] ; then
+                echo "rozpoczecie garowania"
+                TRYB=1
+            fi
+        fi
+    fi
+    if [ $TRYB -eq 2 ] ; then # PLUKANIE NA STOP
+        echo "plukanie na STOP"
+        echo "stop_cnt $PL_STOP_CNT  stop_n $PL_STOP_N"
+        if [ $PL_STOP_CNT -lt $PL_STOP_N ] ; then
+            if [ $PL_STAN -lt 4 ] ; then
+                if [ $PL_STAN -lt 2 ] ; then
+                    if [ $PL_STAN -eq 0 ] && [ $PMP_BUZ_CNT -eq 0 ] ; then
+                        PMP_BUZ_CNT=$PMP_BUZ_TIM
+                        echo "wylewanie"
+                    fi
+                    wylewanie
+                else
+                    if [ $PL_STAN -eq 2 ] && [ $EZ_BUZ_CNT -eq 0 ] ; then
+                        EZ_BUZ_CNT=$EZ_BUZ_TIM
+                        echo "napelnianie"
+                    fi
+                    napelnianie
+                fi
+            else
+                PL_STAN=0
+                PL_STOP_CNT=$(( PL_STOP_CNT+1 ))
+            fi
+        else
+            if [ $PL_STAN -eq 0 ] ; then
+                echo "rozpoczecie garowania"
+                TRYB=3
+            fi
         fi
     fi
 }
+
+tcnt=4
+
 while [ 1 ] ; do
     if [ $TRYB -eq -1 ] ; then
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Inicjalizacja systemu' WHERE comm='tryb_info';"

@@ -29,7 +29,7 @@ PL_START_CNT=0
 PL_STOP_CNT=0
 
 BUZ_STAN=0
-
+WENT_STAN=0
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
     EZ_BUZ_TIM=${tmp[0]}
@@ -136,6 +136,23 @@ function plukanie(){
             if [ $PL_STAN -eq 0 ] ; then
                 echo "rozpoczecie garowania"
                 TRYB=3
+            fi
+        fi
+    fi
+}
+
+function wentylator(){
+     if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie wentylatorem bez stanu"
+    else
+        if [ $WENT_STAN -ne $1 ] ; then
+            WENT_STAN=$1
+            gpo_out "went" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nadmuch', valu=$1 WHERE comm='buz_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='buz_stan';"
             fi
         fi
     fi

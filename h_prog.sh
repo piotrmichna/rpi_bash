@@ -21,7 +21,8 @@ EZ_BUZ_TIM=0         #czas napelnienia buzaw
 PM_PMP_TIM=0    #czas oproznienia buzaw
 PL_START_N=0          # ilosc plukan na starcie
 PL_STOP_N=0            #ilosc plukani na stop
-PL_STAN=-1                 # stan funkcji plukania
+PL_STAN=0                 # stan funkcji plukania 1= NAPELNIANIE 2= WYLEANIE 0=KONIEC
+
 EZ_BUZ_CNT=0
 PMP_BUZ_CNT=0
 PL_START_CNT=0
@@ -40,6 +41,17 @@ function pl_init(){
     mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
 }
 
+function plukanie(){
+    if [ $TRYB -eq 0 ] || [ $TRYB -eq 2 ] ; then
+        if $TRYB -eq 0 ] ; then # PLUKANIE NA START
+            echo "plukanie na start"
+            TRYB=1
+        else # PLUKANIE NA STOP
+            echo "plukanie na stop"
+            TRYB=3
+        fi
+    fi
+}
 while [ 1 ] ; do
     if [ $TRYB -eq -1 ] ; then
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Inicjalizacja systemu' WHERE comm='tryb_info';"

@@ -41,6 +41,20 @@ function pl_init(){
     mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
 }
 
+function wylewanie() {
+    if [ $PMP_BUZ_CNT -eq 0 ] ; then
+        gpo_out "pmp_buz" 0
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Buzawy pusta' WHERE comm='pl_info';"
+        PL_STAN=2
+    else
+        if [ $PMP_BUZ_CNT -eq $PMP_BUZ_TIM ] ; then
+            gpo_out "pmp_buz" 1
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Wylewanie wody z buzaw' WHERE comm='pl_info';"
+        else
+            $PMP_BUZ_CNT=$(( PMP_BUZ_CNT-1 ))
+        fi
+    fi
+}
 function napelnianie() {
     if [ $EZ_BUZ_CNT -eq 0 ] ; then
         gpo_out "ez_buz" 0

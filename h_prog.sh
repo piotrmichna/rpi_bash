@@ -13,6 +13,7 @@ source h_prog_gpio.sh
 source h_test.sh #funkcje testujace czas wykonywania skryptu
 # start_test
 # stop_test
+source h_weather.sh
 
 TNOW=$(date +"%T") #zminna zawierający aktualny czas
 TRYB=-1 # -1 inicjalizacja 0 plukanie start 1 praca 2 plukanie na koniec 3 koniec
@@ -24,9 +25,24 @@ PL_STOP_N=0            #ilosc plukani na stop
 PL_STAN=0                 # stan funkcji plukania 0=START WYLEWANIA 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
 
 EZ_BUZ_CNT=0
+EZ_BUZ_STAN=0
 PMP_BUZ_CNT=0
 PL_START_CNT=0
 PL_STOP_CNT=0
+
+BUZ_STAN=0
+WENT_STAN=0
+WENT_STOP_TIM=-1
+WENT_STOP_CNT=0
+WENT_ALL=0
+GRZA_STAN=0
+OSW_STAN=0
+PRAD_BUZ=0
+ZB_GRZA=0
+SENS_NEW=0
+ERR=0
+TEMP=0
+PWR=0
 
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -44,7 +60,11 @@ function pl_init(){
     PL_START_CNT=0
     PL_STOP_CNT=0
 }
-
+function praca_init(){
+    echo "praca_init"
+    local tmp=$(echo "SELECT valu FROM prog WHERE comm='wetn_stop_tim'" | mysql -D$DB -u $USER -p$PASS -N)
+    WENT_STOP_TIM=${tmp[0]}
+}
 function wylewanie() {
     if [ $PMP_BUZ_CNT -eq 0 ] ; then
         gpo_out "pmp_buz" 0
@@ -139,25 +159,173 @@ function plukanie(){
     fi
 }
 
-tcnt=4
-
-while [ 1 ] ; do
-    if [ $TRYB -eq -1 ] ; then
-        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Inicjalizacja systemu' WHERE comm='tryb_info';"
-        gpio_init
-        pl_init
-        TRYB=0
-        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$TRYB WHERE comm='tryb';"
-    fi
-    if [ $TRYB -eq 1 ] ; then
-        if [ $tcnt -gt 0 ] ; then
-            echo "PRACA"
-            tcnt=$(( tcnt-1 ))
-        else
-            TRYB=2
+function oswietlenie(){
+        if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie oświetleniem bez stanu"
+    else
+        if [ $OSW_STAN -ne $1 ] ; then
+            OSW_STAN=$1
+            gpo_out "osw" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Oświetlenie', valu=$1 WHERE comm='osw_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='osw_stan';"
+            fi
         fi
     fi
-    plukanie
-    echo "tryb=$TRYB PL_STAN=$PL_STAN"
-     sleep 1
-done
+}
+
+function ogrzewanie(){
+     if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie ogrzewaniem bez stanu"
+    else
+        if [ $GRZA_STAN -ne $1 ] ; then
+            GRZA_STAN=$1
+            gpo_out "grza" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nagrzewanie', valu=$1 WHERE comm='grza_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='grza_stan';"
+            fi
+        fi
+    fi
+}
+
+function wentylator(){
+     if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie wentylatorem bez stanu"
+    else
+        local info=NULL
+        if [ $1 -eq 1 ] ; then
+            if [ $WENT_STAN -ne $1 ] ; then
+                WENT_STAN=1
+                WENT_STOP_CNT=$WENT_STOP_TIM
+                WENT_STOP_CNT=$(( WENT_STOP_CNT-1 ))
+                gpo_out "went" 1
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nadmuch', valu=$1 WHERE comm='went_stan';"
+            fi
+        else
+            if [ $WENT_STOP_CNT -eq 0 ] ; then
+                WENT_STAN=0
+                gpo_out "went" 0
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='went_stan';"
+            else
+                WENT_STOP_CNT=$(( WENT_STOP_CNT-1 ))
+            fi
+        fi
+    fi
+}
+
+function buzawa(){
+    if [ -z ${1+x} ] ; then
+        log_sys "er" "setowanie buzawy bez stanu"
+    else
+        if [ $BUZ_STAN -ne $1 ] ; then
+            BUZ_STAN=$1
+            gpo_out "buz" $1
+            local info=NULL
+            if [ $1 -eq 1 ] ; then
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca buzawy', valu=$1 WHERE comm='buz_stan';"
+            else
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='buz_stan';"
+            fi
+        fi
+    fi
+}
+
+function prad_buzawa(){
+    local tmp=$( echo `sensor "i_buz"` )
+    if [ $tmp -ne $PRAD_BUZ ] ; then
+        PRAD_BUZ=$tmp
+        SENS_NEW=1
+    fi
+}
+
+function power(){
+     local tmp=$( echo `sensor "det_pwr"` )
+    if [ $tmp -ne $PWR ] ; then
+        PWR=$tmp
+        SENS_NEW=1
+    fi
+}
+function zb_grzalki(){
+    local tmp=$( echo `sensor "zb_grza"` )
+    if [ $tmp -ne $ZB_GRZA ] ; then
+        ZB_GRZA=$tmp
+        SENS_NEW=1
+    fi
+}
+
+function temperatura(){
+    weather_event
+    zb_grzalki
+    local tem=$( echo "${BME[0]}/1" | bc )
+    if [ $tem -lt $T_MIN ] ; then
+        if [ $ZB_GRZA -eq 1 ] ; then
+            ogrzewanie 1
+            if [ $WENT_ALL -eq 0 ] ; then
+                wentylator 1
+            fi
+        fi
+    fi
+    if [ $ZB_GRZA -eq 0 ] ; then
+        ogrzewanie 0
+         if [ $WENT_ALL -eq 0 ] ; then
+                wentylator 0
+            fi
+        ERR=1
+        mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Błąd zabezpieczenia grzałki' WHERE comm='er';"
+    fi
+    if [ $tem -gt $T_MAX ] ; then
+        ogrzewanie 0
+         if [ $WENT_ALL -eq 0 ] ; then
+            wentylator 0
+        fi
+    fi
+}
+
+function wilgotnosc(){
+    weather_event
+    local wil=$( echo "${BME[2]}/1" | bc )
+    if [ $wil -lt $H_MIN ] ; then
+        buzawa 1
+        if [ $WENT_ALL -eq 0 ] ; then
+            wentylator 1
+        fi
+    fi
+    if [ $BUZ_STAN -eq 1 ] ; then
+        prad_buzawa
+        if [ $PRAD_BUZ -eq 1 ] ; then
+            gpo_out "ez_buz" 1
+            EZ_BUZ_STAN=1
+        else
+            gpo_out "ez_buz" 0
+            EZ_BUZ_STAN=0
+        fi
+    fi
+    if [ $EZ_BUZ_STAN -eq 0 ] ; then
+        if [ $BUZ_STAN -eq 1 ] ; then
+            if [ $wil -gt $H_MAX ] ; then
+                buzawa 0
+                if [ $WENT_ALL -eq 0 ] ; then
+                    wentylator 0
+                fi
+                BUZ_STAN=0
+            fi
+        fi
+    fi
+}
+function praca(){
+    if [ $WENT_STOP_TIM -eq -1 ] ; then
+        praca_init
+    fi
+    temperatura
+    wilgotnosc
+    power
+     if [ $WENT_ALL -eq 1 ] && [ $WENT_STAN -eq 0 ]; then
+        wentylator 1
+    fi
+}
+

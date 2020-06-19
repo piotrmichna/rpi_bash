@@ -7,6 +7,7 @@ source h_log.sh #funkcje zapisu informacj zdazen do bazy danych
 # log_gp "er" GPIO STAN "blędna informacja"
 # log_gp GPIO STAN "poprawna informacja"
 
+
 GP_NUM=-1
 GP_ID[0]=0
 GP_NAZ[0]=""
@@ -24,15 +25,15 @@ function sensor(){
         echo "-1"
     else
         local GID=0
+
         for (( i=0 ; i<GP_NUM ; i++ )) ; do
             if [ ${GP_NAZ[$i]} = $1 ] ; then
                 GID=$i
                 break;
             fi
         done
-
         local ret=$( gpio read ${GP_GPIO[$GID]} )
-        if [ $ret -ne $GP_STAN[$GID] ] ; then
+        if [ $ret -ne ${GP_STAN[$GID]} ] ; then
             GP_STAN[$GID]=$ret
             if [ ${GP_STAN[$GID]} -eq ${GP_STAN_ACT[$GID]} ] ; then
                 log_gp "${GP_GPIO[$GID]}" "$ret" "stan poprawny"
@@ -42,7 +43,7 @@ function sensor(){
             fi
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE item SET stan=${GP_STAN[$GID]} WHERE id=${GP_ID[$GID]};"
         fi
-         if [ $GP_STAN[$GID]= -eq ${GP_STAN_ACT[$GID]} ] ; then
+         if [ ${GP_STAN[$GID]} -eq ${GP_STAN_ACT[$GID]} ] ; then
             echo "1"
         else
             echo "0"
@@ -141,7 +142,7 @@ function gpio_init(){
       fi
       gpio mode ${GP_GPIO[$i]} out #kierunek wyjściowy
     else  # wejście pomiaru
-    #gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
+
       if [ ${GP_STAN_ACT[$i]} -eq 1 ] ; then
         gpio mode ${GP_GPIO[$i]} up #pulup GND
         GP_STAN[$i]=1
@@ -149,6 +150,7 @@ function gpio_init(){
         gpio mode ${GP_GPIO[$i]} down #pulup Vcc
         GP_STAN[$i]=0
       fi
+      gpio mode ${GP_GPIO[$i]} in #kierunek wejściowy
     fi
   done
 }

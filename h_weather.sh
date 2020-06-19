@@ -31,7 +31,7 @@ function get_bme(){
     BME_AVT[$BME_AV_NUM]=$(echo "${BME[0]}*10" | bc)
     BME_AVP[$BME_AV_NUM]=$(echo "${BME[1]}*10" | bc)
     BME_AVH[$BME_AV_NUM]=$(echo "${BME[2]}*10" | bc)
-		BME_AV_NUM=$(( BME_AV_NUM+1 ))	
+		BME_AV_NUM=$(( BME_AV_NUM+1 ))
 }
 
 function get_bme_min(){
@@ -58,7 +58,7 @@ function get_bme_min(){
 						BME[1]=$( echo "scale=1;$p/$BME_AV_NUM/10.0" | bc )
 						BME[2]=$( echo "scale=1;$h/$BME_AV_NUM/10.0" | bc )
 						BME_AV_NUM=0
-    				CUR_DATTIME=$(date +"%s")
+                        CUR_DATTIME=$(date +"%s")
 						CUR_DATTIME=$(( CUR_DATTIME-MIN_DIV ))
 
     				mysql -D$DBW -u $USER -p$PASS -N -e"INSERT INTO temp_min (id, dattim, tem) VALUES (NULL, $CUR_DATTIME, '${BME[0]}');"

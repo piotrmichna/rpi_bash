@@ -17,25 +17,28 @@ source h_weather.sh
 function main(){
     log_sys "START SYSTEMU"
 
-    while [ 1 ] ; do
-        #start_test
+   while [ 1 ] ; do
         weather_event
-        prog_event
-        #stop_test
-        if [ $PR_ID -lt 0 ] ; then
-            sys_event
+        sys_event
+        if [ $TRYB -eq -1 ] ; then
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Inicjalizacja systemu' WHERE comm='tryb_info';"
+            gpio_init
+            pl_init
+            TRYB=0
+            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$TRYB WHERE comm='tryb';"
         fi
-				
-				#H=$( humi_is )
-				#T=$( temp_is )
-
+        if [ $TRYB -eq 1 ] ; then
+            praca
+            if [ $PWR -eq 0 ] ; then
+                TRYB=2
+            fi
+        fi
+        plukanie
+        if [ $TRYB -eq 3 ] ; then
+            sudo shutdown now
+            sudo systemctl stop homster.service
+        fi
         sleep 1
-        if [ $SYS_RELOAD -eq 1 ] ; then
-            log_sys "PRZEŁADOWANIE usługi systemowej"
-            mysql -D$DB -u $USER -p$PASS -N -e"UPDATE cnf SET valu=0 WHERE comm='reload';"
-            SYS_RELOAD=0
-            sudo systemctl restart homster.service
-        fi
     done
 }
 main

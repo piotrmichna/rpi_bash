@@ -217,8 +217,8 @@ function buzawa(){
 function prad_buzawa(){
     PRAD_BUZ=$( echo `sensor "i_buz"` )
 }
-function zab_grzawlki(){
-    PRAD_BUZ=$( echo `sensor "zb_grza"` )
+function zb_grzawlki(){
+    ZB_GRZA=$( echo `sensor "zb_grza"` )
 }
 tcnt=4
 

@@ -34,6 +34,8 @@ GRZA_STAN=0
 OSW_STAN=0
 PRAD_BUZ=0
 ZB_GRZA=0
+SENS_NEW=0
+ERR=0
 
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -215,13 +217,21 @@ function buzawa(){
 }
 
 function prad_buzawa(){
-    PRAD_BUZ=$( echo `sensor "i_buz"` )
+    local tmp==$( echo `sensor "i_buz"` )
+    if [ $tmp -ne $PRAD_BUZ ] ; then
+        PRAD_BUZ=$tmp
+        SENS_NEW=1
+    fi
 }
 function zb_grzawlki(){
-    ZB_GRZA=$( echo `sensor "zb_grza"` )
+    local tmp=$( echo `sensor "zb_grza"` )
+    if [ $tmp -ne $ZB_GRZA ] ; then
+        ZB_GRZA=$tmp
+        SENS_NEW=1
+    fi
 }
-tcnt=4
 
+tcnt=4
 while [ 1 ] ; do
     if [ $TRYB -eq -1 ] ; then
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Inicjalizacja systemu' WHERE comm='tryb_info';"

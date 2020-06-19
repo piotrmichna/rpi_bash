@@ -15,13 +15,13 @@ source h_test.sh #funkcje testujace czas wykonywania skryptu
 # stop_test
 
 TNOW=$(date +"%T") #zminna zawierający aktualny czas
-TRYB=-1
+TRYB=-1 # -1 inicjalizacja 0 plukanie start 1 praca 2 plukanie na koniec 3 koniec
 
 EZ_BUZ_TIM=0         #czas napelnienia buzaw
 PMP_BUZ_TIM=0    #czas oproznienia buzaw
 PL_START_N=0          # ilosc plukan na starcie
 PL_STOP_N=0            #ilosc plukani na stop
-PL_STAN=0                 # stan funkcji plukania 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
+PL_STAN=0                 # stan funkcji plukania 0=START WYLEWANIA 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
 
 EZ_BUZ_CNT=0
 PMP_BUZ_CNT=0
@@ -54,13 +54,14 @@ function wylewanie() {
     else
         if [ $PMP_BUZ_CNT -eq $PMP_BUZ_TIM ] ; then
             gpo_out "pmp_buz" 1
+            PL_STAN=1
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Wylewanie wody z buzaw' WHERE comm='pl_info';"
             mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
-        else
-            $PMP_BUZ_CNT=$(( PMP_BUZ_CNT-1 ))
         fi
+        PMP_BUZ_CNT=$(( PMP_BUZ_CNT-1 ))
     fi
 }
+
 function napelnianie() {
     if [ $EZ_BUZ_CNT -eq 0 ] ; then
         gpo_out "ez_buz" 0
@@ -97,6 +98,15 @@ while [ 1 ] ; do
         TRYB=0
         mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$TRYB WHERE comm='tryb';"
     fi
-    echo "tryb=$TRYB PL_START_N=$PL_START_N"
+    if [ $TRYB -eq 1 ] ; then
+        if [ $tcnt -gt 0 ] ; then
+            echo "PRACA"
+            tcnt=$(( tcnt-1 ))
+        else
+            TRYB=2
+        fi
+    fi
+    plukanie
+    echo "tryb=$TRYB PL_STAN=$PL_STAN"
      sleep 1
 done

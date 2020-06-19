@@ -150,9 +150,9 @@ function wentylator(){
             gpo_out "went" $1
             local info=NULL
             if [ $1 -eq 1 ] ; then
-                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nadmuch', valu=$1 WHERE comm='buz_stan';"
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info='Praca nadmuch', valu=$1 WHERE comm='went_stan';"
             else
-                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='buz_stan';"
+                mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET info=NULL, valu=$1 WHERE comm='went_stan';"
             fi
         fi
     fi

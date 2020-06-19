@@ -33,6 +33,7 @@ WENT_STAN=0
 GRZA_STAN=0
 OSW_STAN=0
 PRAD_BUZ=0
+ZB_GRZA=0
 
 function pl_init(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -215,6 +216,9 @@ function buzawa(){
 
 function prad_buzawa(){
     PRAD_BUZ=$( echo `sensor "i_buz"` )
+}
+function zab_grzawlki(){
+    PRAD_BUZ=$( echo `sensor "zb_grza"` )
 }
 tcnt=4
 

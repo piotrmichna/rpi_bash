@@ -34,7 +34,7 @@ BUZ_STAN=0
 WENT_STAN=0
 WENT_STOP_TIM=-1
 WENT_STOP_CNT=0
-WENT_ALL=0
+WENT_ALL=1
 GRZA_STAN=0
 OSW_STAN=0
 PRAD_BUZ=0
@@ -43,8 +43,7 @@ SENS_NEW=0
 ERR=0
 TEMP=0
 PWR=0
-
-function pl_init(){
+function prog_data(){
     local tmp=$(echo "SELECT valu FROM prog WHERE comm='ez_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
     EZ_BUZ_TIM=${tmp[0]}
     tmp=$(echo "SELECT valu FROM prog WHERE comm='pmp_buz_time'" | mysql -D$DB -u $USER -p$PASS -N)
@@ -53,12 +52,47 @@ function pl_init(){
     PL_START_N=${tmp[0]}
     tmp=$(echo "SELECT valu FROM prog WHERE comm='pl_stop_n'" | mysql -D$DB -u $USER -p$PASS -N)
     PL_STOP_N=${tmp[0]}
-    PL_STAN=0
+    tmp=$(echo "SELECT valu FROM prog WHERE comm='wetn_stop_tim'" | mysql -D$DB -u $USER -p$PASS -N)
+    WENT_STOP_TIM=${tmp[0]}
+    tmp=$(echo "SELECT valu FROM prog WHERE comm='wetn_all" | mysql -D$DB -u $USER -p$PASS -N)
+    WENT_ALL=1
+    tmp=$(echo "SELECT valu FROM cnf WHERE comm='temp_min'" | mysql -D$DBW -u $USER -p$PASS -N)
+    T_MIN=${tmp[0]}
+    tmp=$(echo "SELECT valu FROM cnf WHERE comm='temp_max'" | mysql -D$DBW -u $USER -p$PASS -N)
+    T_MAX=${tmp[0]}
+    tmp=$(echo "SELECT valu FROM cnf WHERE comm='humi_min'" | mysql -D$DBW -u $USER -p$PASS -N)
+    H_MIN=${tmp[0]}
+    tmp=$(echo "SELECT valu FROM cnf WHERE comm='humi_max'" | mysql -D$DBW -u $USER -p$PASS -N)
+    H_MAX=${tmp[0]}
+}
+function pl_init(){
     mysql -D$DB -u $USER -p$PASS -N -e"UPDATE prog SET valu=$PL_STAN WHERE comm='pl_stan';"
+    EZ_BUZ_TIM=0         #czas napelnienia buzaw
+    PMP_BUZ_TIM=0    #czas oproznienia buzaw
+    PL_START_N=0          # ilosc plukan na starcie
+    PL_STOP_N=0            #ilosc plukani na stop
+    PL_STAN=0                 # stan funkcji plukania 0=START WYLEWANIA 1= WYLEANIE 2= KONIEC WYLEWANIA 3= NAPELNIANIE 4=KONIEC NAPELNIANIA
+
     EZ_BUZ_CNT=0
+    EZ_BUZ_STAN=0
     PMP_BUZ_CNT=0
     PL_START_CNT=0
     PL_STOP_CNT=0
+
+    BUZ_STAN=0
+    WENT_STAN=0
+    WENT_STOP_TIM=-1
+    WENT_STOP_CNT=0
+    WENT_ALL=1
+    GRZA_STAN=0
+    OSW_STAN=0
+    PRAD_BUZ=0
+    ZB_GRZA=0
+    SENS_NEW=0
+    ERR=0
+    TEMP=0
+    PWR=0
+    prog_data
 }
 function praca_init(){
     echo "praca_init"
@@ -265,9 +299,9 @@ function temperatura(){
     if [ $tem -lt $T_MIN ] ; then
         if [ $ZB_GRZA -eq 1 ] ; then
             ogrzewanie 1
-            if [ $WENT_ALL -eq 0 ] ; then
+
                 wentylator 1
-            fi
+
         fi
     fi
     if [ $ZB_GRZA -eq 0 ] ; then
@@ -291,9 +325,7 @@ function wilgotnosc(){
     local wil=$( echo "${BME[2]}/1" | bc )
     if [ $wil -lt $H_MIN ] ; then
         buzawa 1
-        if [ $WENT_ALL -eq 0 ] ; then
-            wentylator 1
-        fi
+        wentylator 1
     fi
     if [ $BUZ_STAN -eq 1 ] ; then
         prad_buzawa
@@ -310,22 +342,29 @@ function wilgotnosc(){
             if [ $wil -gt $H_MAX ] ; then
                 buzawa 0
                 if [ $WENT_ALL -eq 0 ] ; then
-                    wentylator 0
+                    gpo_out "ez_buz" 0
                 fi
                 BUZ_STAN=0
             fi
         fi
     fi
 }
-function praca(){
-    if [ $WENT_STOP_TIM -eq -1 ] ; then
-        praca_init
+prace_sec=10
+function data_refesh(){
+    if [ $prace_sec -eq 0 ] ; then
+        prog_data
+        prace_sec=10
+    else
+        prace_sec=$(( prace_sec-1 ))
     fi
+}
+function praca(){
     temperatura
     wilgotnosc
     power
-     if [ $WENT_ALL -eq 1 ] && [ $WENT_STAN -eq 0 ]; then
+     if [ $WENT_ALL -eq 1 ] && [ $WENT_STAN -eq 0 ] ; then
         wentylator 1
     fi
+    data_refesh
 }
 

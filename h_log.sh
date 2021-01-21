@@ -1,8 +1,8 @@
 #!/bin/bash
 #___h_log.sh___
 
-USER="pituEl"
-PASS="hi24biscus"
+USER="user"
+PASS="pass"
 DB="homster"
 DBH="homhist"
 DBW="homsweather"
